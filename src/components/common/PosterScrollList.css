@@ -1,0 +1,10 @@
+.title {
+  color:white;
+  margin-top: 10px;
+}
+
+.posterbox {
+  display: inline-flex;
+  justify-content: flex-start;
+  width:100%;
+}

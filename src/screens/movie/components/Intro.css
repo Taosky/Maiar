@@ -1,0 +1,20 @@
+.text {
+  color: #CECECE;
+  font-size: 28px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.textFull {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  color: #CECECE;
+  font-size: 28px;
+}
+
+.expandBtn {
+  text-decoration: underline;
+}

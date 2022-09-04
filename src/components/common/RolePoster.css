@@ -1,0 +1,25 @@
+.poster {
+  display: inline-block;
+  width: 180rpx;
+  font-size: 24rpx;
+  margin:16rpx
+}
+.image {
+  width: 180rpx;
+  height:252rpx;
+  border-radius: 8px;
+}
+.title {
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.subtitle{
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  color:#ffffff9c;
+}

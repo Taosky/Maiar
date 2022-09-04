@@ -1,0 +1,14 @@
+.backdrop {
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+  height: 56.25vw;
+  margin: 0 0 0 -20px;
+  -webkit-mask-image: -webkit-linear-gradient(bottom, transparent, #000 50%);
+  mask-image: linear-gradient(bottom, transparent, #000 50%);
+  width:100%;
+}
+
+.topadjust {
+  margin-top:110px;
+}
