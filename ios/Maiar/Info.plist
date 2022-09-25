@@ -51,5 +51,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>iqiyi</string>
+		<string>miguvideo</string>
+		<string>tenvideo2</string>
+		<string>youku</string>
+		<string>bilibili</string>
+		<string>imgotv</string>
+		<string>cntvcbox</string>
+	</array>
 </dict>
 </plist>

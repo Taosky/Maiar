@@ -8,3 +8,7 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# react-native-image-filter-kit
+-keep class com.facebook.react.views.image.** { *; }
+-keep class com.facebook.drawee.** { *; }

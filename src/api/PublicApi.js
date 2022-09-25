@@ -27,12 +27,28 @@ const getTvVarietyShow = () => {
 }
 
 const getMovieById = (id) => {
-  return `/movies/${id}`
+  return `/movie/${id}`
+}
+const getMovieRatingById = (id) => {
+  return `/movie/${id}/rating`
+}
+const getMovieRecommendationsById = (id) => {
+  return `/movie/${id}/recommendations`
+}
+const getMoviePhotosById = (id) => {
+  return `/movie/${id}/photos`
+}
+const getMoviesByTitle = () => {
+  return `/movies`
+}
+const getCelebrityById = (id)=>{
+  return `/celebrity/${id}`
 }
 
-const getMoviesByTitle = (title, page) => {
-  return `/movies?q=${title}&page=${page}&limit=10`
+const getRankMovies = (_type)=>{
+  return `/rank/${_type}`
 }
+
 
 export {
   getMovieHotGaia,
@@ -41,4 +57,9 @@ export {
   getTvVarietyShow,
   getMovieById,
   getMoviesByTitle,
+  getMovieRatingById,
+  getMovieRecommendationsById,
+  getMoviePhotosById,
+  getCelebrityById,
+  getRankMovies,
 }

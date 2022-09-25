@@ -1,24 +1,25 @@
 import * as React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { useState, useEffect } from 'react'
+import { RefreshControl, ScrollView } from "react-native";
+import * as api from '../../api/APIUtils'
 import { getMovieHotGaia, getMovieShowing, getTvHot, getTvVarietyShow } from '../../api/PublicApi'
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center"
-  },
-  horizontal: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 10
-  }
-});
+import { Box, Loading } from '../../theme/base'
+import PosterScrollList from '../../components/common/PosterScrollList'
+import { MoviePoster } from '../../components/common/Poster'
+import SearchBar from '../../components/common/SearchBar'
 
-
-export default () => {
+export default ({ route, navigation }) => {
 
   const [recentHots, setRecentHots] = useState(new Array());
   const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    getRcentHots();
+  }, []);
+
+
 
   const format = (data) => {
     return data.map((current) => {
@@ -26,8 +27,13 @@ export default () => {
         id: current.id,
         image: current.cover ? current.cover.url : current.pic?.normal,
         title: current.title,
-        rate: current.rating ? Number(current.rating.value) / 2 : 0,
-        onClickMethod: () => navigateTo({ url: `/pages/movie/detail?id=${current.id}` }),
+        rate: current.rating ? current.rating.value : 0,
+        onPressMethod: () => navigation.navigate('NoTabScreen', {
+          screen: 'MovieDetail',
+          params: {
+            mid: current.id
+          }
+        }),
       }
     })
 
@@ -39,12 +45,12 @@ export default () => {
 
     let data = await api.get(getMovieHotGaia(), {}, 'public');
     curRecentHots.push({
-      title: '热门电影',
+      title: '豆瓣热门',
       moviePosters: format(data)
     });
     data = await api.get(getMovieShowing(), {}, 'public');
     curRecentHots.push({
-      title: '当前热映',
+      title: '正在上映',
       moviePosters: format(data)
     });
 
@@ -66,34 +72,38 @@ export default () => {
   }
 
 
-  const searchTitle = (keyword) => {
-    navigateTo({ url: `/pages/search/result?q=${keyword}` })
-  }
-
-  usePageEvent('onLoad', async () => {
-    getRcentHots();
-  });
-
 
   return (
-    <View className={styles.app}>
-      <LoadingMask show={loading} />
-      <View className={styles.header}>
-        <View className={styles.searchBar}>
-          <SearchBar placeholder="搜索" onSubmit={searchTitle}></SearchBar>
-        </View>
-      </View>
-      <View className={styles.main}>
-        <View>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      // refreshControl={
+      //   <RefreshControl
+      //     refreshing={loading}
+      //     onRefresh={getRcentHots}
+      //     title="正在加载中..."
+      //   />}
+    >
+      <Box paddingVertical='m'>
+        <SearchBar
+          onSubmitMethod={(keyword) => navigation.navigate('NoTabScreen', {
+            screen: 'SearchResult',
+            params:{
+            keyword: keyword,}
+          })}
+        />
+
+        {recentHots?.length === 0 && <Box margin='xl'><Loading /></Box>}
+
+        <Box marginVertical='s' marginLeft='m'>
           {
             recentHots?.map((hotList) =>
-              <PosterScrollList key={hotList.title} title={hotList.title} posterItems={hotList.moviePosters.map((moviePoster) =>
-                <MoviePoster key={moviePoster.id} moviePoster={moviePoster} />
+              <PosterScrollList marginVertical='s' key={hotList.title} title={hotList.title} posterItems={hotList.moviePosters?.map((movie) =>
+                <MoviePoster key={movie.id} movie={movie} />
               )}></PosterScrollList>
             )
           }
-        </View >
-      </View>
-    </View>
+        </Box>
+      </Box>
+    </ScrollView>
   );
 };

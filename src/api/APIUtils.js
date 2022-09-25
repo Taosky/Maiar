@@ -1,5 +1,4 @@
-import { request as wxRequest, showToast, showLoading } from 'remax/wechat'
-
+import { Alert } from "react-native";
 
 const baseUrls = {
   'public': 'https://maiar.8610000.xyz/api/v1',
@@ -7,17 +6,12 @@ const baseUrls = {
   'profile': '',
 }
 
-const networkError = () => {
-  showToast({ icon: 'error', title: '网络错误' })
-}
-const obj2String = (obj, arr = [], idx = 0) => {
-  for (let item in obj) {
-    arr[idx++] = [item, obj[item]]
-  }
-  return new URLSearchParams(arr).toString()
+
+const obj2String = (obj) => {
+  return new URLSearchParams(obj).toString()
 }
 
-const request = (url, options, apiType) => {
+const request = async (url, options, apiType, navigation) => {
   let fetchOptions = {
     method: options.method, //配置method方法
     header: {
@@ -31,42 +25,56 @@ const request = (url, options, apiType) => {
   } else if (options.method === 'POST') {
     fetchOptions.body = JSON.stringify(options.data)
   }
-
-  return new Promise(() => {
-    fetch(`${baseUrls[apiType]}${url}`, fetchOptions)
-  });
+  try {
+    let response = await fetch(`${baseUrls[apiType]}${url}`, fetchOptions);
+    res = await response.json();
+    if (!res) {
+      Alert.alert('请求失败', '未接收到数据',
+        [
+          {
+            text: "OK",
+            style: "default",
+          },
+        ]);
+    }
+    return res
+  } catch (error) {
+    console.log('Request Failed', error);
+    Alert.alert('请求失败', '网络连接出错')
+    return null
+  }
 }
 
 
 //封装get方法
-const get = (url, options = {}, apiType) => {
+const get = (url, options = {}, apiType, navigation = null) => {
   console.log(url)
   return request(url, {
     method: 'GET',
     data: options
-  }, apiType)
+  }, apiType, navigation)
 }
 //封装post方法
-const post = (url, options) => {
+const post = (url, options, navigation = null) => {
   return request(url, {
     method: 'POST',
     data: options
-  }, apiType)
+  }, apiType, navigation)
 }
 //封装put方法
-const put = (url, options) => {
+const put = (url, options, navigation = null) => {
   return request(url, {
     method: 'PUT',
     data: options
-  }, apiType)
+  }, apiType, navigation)
 }
 //封装remove方法
 // 不能声明DELETE（关键字）
-const remove = (url, options) => {
+const remove = (url, options, navigation = null) => {
   return request(url, {
     method: 'DELETE',
     data: options
-  }, apiType)
+  }, apiType, navigation)
 }
 
 export {
