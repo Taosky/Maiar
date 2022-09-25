@@ -59,7 +59,7 @@ const RolePoster = ({ role, ...rest }) => {
       <Box style={styles.poster}>
         <FastImage style={styles.image} source={{ uri: role.cover, priority: FastImage.priority.normal, }}></FastImage>
         <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{role.name}</Text>
-        <Text variant='desc3'>{role.role}</Text>
+        <Text variant='desc3' ellipsizeMode='tail' numberOfLines={1}>{role.role}</Text>
       </Box>
     </TouchableOpacity>
   );

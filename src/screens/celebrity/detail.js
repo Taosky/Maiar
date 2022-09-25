@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 
 import { Box, Text } from '../../theme/base';
 import { RolePoster, MoviePoster } from '../../components/common/Poster';
@@ -48,32 +48,31 @@ export default ({ route, navigation }) => {
 
 
   return (
-    <Box style={{ flex: 1 }}>
+    <Box>
       <ScrollView>
-        <SafeAreaView>
-          <FadeView show={!loading}>
-            <Box padding='m'>
-              <Box marginTop='m' justifyContent='center' flexDirection='row'>
-                <RolePoster role={{ cover: celebrity?.cover_url ? celebrity?.cover_url : celebrity?.avatar?.normal }} />
-              </Box>
-              <Box style={{ marginTop: -20 }}>
-                <Text style={{ textAlign: 'center' }} variant='title1'>{celebrity?.name}</Text>
-                <Text style={{ textAlign: 'center' }} variant='desc2'>{celebrity?.roles?.join(', ')}</Text>
-              </Box>
-              <Box marginVertical='ss'>
-                <Text variant='title2'>简介</Text>
-                <Text variant='desc2'>
-                  {celebrity?.abstract}
-                </Text>
-              </Box>
-              <PosterWall marginVertical='s' title={'相关作品'} posterItems={
-                celebrity?.movies?.map((movie, index) => <MoviePoster key={index} movie={movie} />)
-              } />
-            </Box>
-          </FadeView>
-        </SafeAreaView>
-      </ScrollView>
 
+        <FadeView show={!loading}>
+          <Box padding='m'>
+            <Box marginTop='m' justifyContent='center' flexDirection='row'>
+              <RolePoster role={{ cover: celebrity?.cover_url ? celebrity?.cover_url : celebrity?.avatar?.normal }} />
+            </Box>
+            <Box style={{ marginTop: -20 }}>
+              <Text style={{ textAlign: 'center' }} variant='title1'>{celebrity?.name}</Text>
+              <Text style={{ textAlign: 'center' }} variant='desc2'>{celebrity?.roles?.join(', ')}</Text>
+            </Box>
+            <Box marginVertical='ss'>
+              <Text variant='title2'>简介</Text>
+              <Text variant='desc2'>
+                {celebrity?.abstract}
+              </Text>
+            </Box>
+            <PosterWall marginVertical='s' title={'相关作品'} posterItems={
+              celebrity?.movies?.map((movie, index) => <MoviePoster key={index} movie={movie} />)
+            } />
+          </Box>
+        </FadeView>
+
+      </ScrollView>
     </Box>
   )
 

@@ -75,18 +75,18 @@ export default ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView
-      onScroll={({ nativeEvent }) => {
-        if (isCloseToBottom(nativeEvent)) {
-          if (noMore) {
-            return
+    <Box>
+      <ScrollView
+        onScroll={({ nativeEvent }) => {
+          if (isCloseToBottom(nativeEvent)) {
+            if (noMore) {
+              return
+            }
+            getData();
           }
-          getData();
-        }
-      }}
-      scrollEventThrottle={400}
-    >
-      <SafeAreaView>
+        }}
+        scrollEventThrottle={400}
+      >
         <Box padding='m'>
           <Box flexDirection='row'>
             <Text variant='title3'>
@@ -108,8 +108,8 @@ export default ({ route, navigation }) => {
             <Text variant='tip'>{noMore && '(´・ω・｀) 没有更多了'}</Text>
           </Box>
         </Box>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </Box>
   )
 
 }

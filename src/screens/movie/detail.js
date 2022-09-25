@@ -444,7 +444,7 @@ export default ({ route, navigation }) => {
   }
 
   return (
-    <Box style={{ flex: 1 }}>
+    <Box>
       <ScrollView
         onScroll={(event) => {
           const scrollY = event.nativeEvent.contentOffset.y;
