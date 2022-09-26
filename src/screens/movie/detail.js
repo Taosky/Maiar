@@ -6,14 +6,12 @@ import { Box, Text } from '../../theme/base';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '@react-navigation/native';
 import ImageView from "react-native-image-viewing";
-import * as api from '../../api/APIUtils'
-import { getMovieById, getMovieRatingById, getMovieRecommendationsById, getMoviePhotosById } from '../../api/PublicApi'
+import { storage, alert404 } from '../../utils';
 import PosterScrollList from '../../components/common/PosterScrollList'
 
 import Backdrop from '../../components/common/Backdrop';
 import { MoviePoster, RolePoster, PhotoPoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
-import { alert404 } from '../../utils/index'
 
 
 const MyButton = ({ title, onPressMethod, ...rest }) => {
@@ -108,7 +106,7 @@ const RatingInfo = ({ mid, ...rest }) => {
     if (!mid) {
       return
     }
-    let data = await api.get(getMovieRatingById(mid), {}, 'public');
+    let data = await storage.load({ key: 'rating', id: mid });
     setRating(data);
   }
 
@@ -118,9 +116,9 @@ const RatingInfo = ({ mid, ...rest }) => {
 
   return (
     <Box>
-      {rating.type_ranks && rating.type_ranks != [] &&
+      {rating?.type_ranks && rating?.type_ranks != [] &&
         <Box flexDirection='row' {...rest}>
-          {rating.type_ranks.map((rank) => {
+          {rating?.type_ranks.map((rank) => {
             <Box marginRight='s'>
               <Text>`好于${(rank.rank * 100).toFixed(2)}的${rank.type}`</Text>
             </Box>
@@ -210,7 +208,7 @@ const Roles = ({ directors, actors, ...rest }) => {
     <Box {...rest}>
       {directors && actors &&
         <PosterScrollList title={'演职人员'} posterItems={
-          roles?.map((role, index) => <RolePoster key={index} role={role} />)
+          roles?.map((role, index) => <RolePoster marginRight='m' key={index} role={role} />)
         } />
       }
     </Box>
@@ -244,23 +242,21 @@ const Photos = ({ mid, ...rest }) => {
     if (!mid) {
       return
     }
-    let data = await api.get(getMoviePhotosById(mid), {}, 'public');
-    if (data.photos?.length > 0) {
+    let data = await storage.load({ key: 'photos', id: mid });
+    if (data?.photos?.length > 0) {
       let smallImages = [];
       let largeImages = [];
       let index = 0;
       for (const photo of data.photos) {
         if (photo.image?.is_animated === false && photo.image?.large && photo.image?.small) {
-          if (index < 10) {
-            const photoIndex = index;
-            smallImages.push({
-              uri: photo.image.small.url,
-              onPressMethod: () => {
-                setPhotoIndex(photoIndex);
-                setIsVisible(true);
-              },
-            });
-          }
+          const photoIndex = index;
+          smallImages.push({
+            uri: photo.image.small.url,
+            onPressMethod: () => {
+              setPhotoIndex(photoIndex);
+              setIsVisible(true);
+            },
+          });
           largeImages.push({ uri: photo.image.large.url });
           index += 1;
         }
@@ -274,7 +270,7 @@ const Photos = ({ mid, ...rest }) => {
       {smalls.length > 0 &&
         <Box {...rest}>
           <PosterScrollList title={'剧照'} posterItems={
-            smalls?.map((photo, index) => <PhotoPoster key={index} photo={photo} />)
+            smalls?.map((photo, index) => <PhotoPoster marginRight='s' key={index} photo={photo} />)
           } />
           <ImageView
             images={larges}
@@ -298,7 +294,7 @@ const Recomendations = ({ mid, navigation, ...rest }) => {
     if (!mid) {
       return
     }
-    let data = await api.get(getMovieRecommendationsById(mid), {}, 'public');
+    let data = await storage.load({ key: 'recommendations', id: mid });
     if (data?.recommendations) {
       let movies = [];
       for (const current of data.recommendations) {
@@ -325,7 +321,7 @@ const Recomendations = ({ mid, navigation, ...rest }) => {
     <Box {...rest}>
       {recommendations.length > 0 &&
         <PosterScrollList title={'相关推荐'} posterItems={
-          recommendations?.map((movie, index) => <MoviePoster key={index} movie={movie} />)
+          recommendations?.map((movie, index) => <MoviePoster marginRight='m' key={index} movie={movie} />)
         } />
       }
     </Box>
@@ -432,8 +428,8 @@ export default ({ route, navigation }) => {
 
   const getMovieDetail = async () => {
     setLoading(true);
-    let data = await api.get(getMovieById(mid), {}, 'public', navigation = navigation);
-    if (data.code === 404) {
+    let data = await storage.load({ key: 'movie', id: mid });
+    if (data?.code === 404) {
       alert404(navigation);
     }
     let formated_movie = formatMovieData(data)

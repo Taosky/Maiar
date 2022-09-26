@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react'
-import { ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
+
+import { storage, sleep } from '../../utils';
 import { Box, Text, Loading } from '../../theme/base'
 import Icon from 'react-native-vector-icons/Ionicons';
 import MovieCard from '../../components/common/MovieCard'
-import * as api from '../../api/APIUtils'
-import { getRankMovies, } from '../../api/PublicApi'
 
 
 export default ({ route, navigation }) => {
@@ -40,7 +40,8 @@ export default ({ route, navigation }) => {
 
   const getData = async () => {
     setLoading(true)
-    const data = await api.get(getRankMovies(type_), { page: page, limit: pageSize }, 'public');
+    await sleep(200);
+    const data = await storage.load({ key: 'rank', id: `${type_.replace(/_/g, '-')}+${page}`, syncParams: { page: page, limit: pageSize } });
     if (data.total <= page * pageSize) {
       setNoMore(true);
     }
@@ -88,11 +89,13 @@ export default ({ route, navigation }) => {
         scrollEventThrottle={400}
       >
         <Box padding='m'>
-          <Box flexDirection='row'>
-            <Text variant='title3'>
-              共{rankInfo?.total}部，更新于{rankInfo?.updateAt}
-            </Text>
-          </Box>
+          {
+            rankInfo && <Box flexDirection='row'>
+              <Text variant='title3'>
+                共{rankInfo?.total}部，更新于{rankInfo?.updateAt}
+              </Text>
+            </Box>
+          }
           <Box>
             {
               movies.map((movie, index) => (

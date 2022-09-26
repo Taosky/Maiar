@@ -73,7 +73,7 @@ export default ({ route, navigation }) => {
       >
         <Box padding='s'>
           {movies?.map((movie) =>
-            <MovieCard key={movie.id} item={movie} />
+            <MovieCard marginVertical='s' key={movie.id} item={movie} />
           )}
         </Box>
         {loading && <Loading />}

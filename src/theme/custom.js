@@ -16,7 +16,7 @@ const palette = {
   whiteSmoke: '#F2F2F2',
   whhiteSmokeRGBWithAlpha: 'rgba(242,242,242,1)',
   whiteSmokeMore: '#E5E5E7',
-  whiteSmokeMoreLess: '#e5e5e790',
+  whiteSmokeMoreMore: '#d5d5d5',
   orange: '#ff9933',
 };
 
@@ -26,7 +26,7 @@ export const theme = {
     primary: palette.azureBlue,
     background: palette.whiteSmoke,
     card: palette.white,
-    subcard: palette.whiteSmokeMoreLess,
+    subcard: palette.whiteSmokeMoreMore,
     text: palette.darkStoneGrey,
     border: palette.gainsboroughGrey,
     notification: palette.orangeRed,

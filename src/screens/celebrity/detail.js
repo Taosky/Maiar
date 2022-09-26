@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 
+import { storage } from '../../utils';
 import { Box, Text } from '../../theme/base';
 import { RolePoster, MoviePoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
 import PosterWall from '../../components/common/PosterWall';
-
-
-import * as api from '../../api/APIUtils'
-import { getCelebrityById } from '../../api/PublicApi'
-
-
 
 export default ({ route, navigation }) => {
   const { cid } = route.params;
@@ -37,7 +32,7 @@ export default ({ route, navigation }) => {
 
   const getCelebrityDetail = async () => {
     setLoading(true);
-    const data = await api.get(getCelebrityById(cid), {}, 'public');
+    const data = await storage.load({ key: 'celebrity', id: cid });
     const movies = data?.movies;
     data.movies = formatedMovies(movies);
     setCelebrity(data);

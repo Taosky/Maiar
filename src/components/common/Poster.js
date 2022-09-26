@@ -1,20 +1,20 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { Box, Text } from '../../theme/base'
 import Rate from './StarRating'
-import { WLR, } from '../../utils/index'
+import { WLR, } from '../../utils'
+import AutoHeightImage from './AutoHeightImage';
 
 
 const posterWidth = 90 * WLR;
-const squareWidth = 140 * WLR;
+const photoHeight = 100 * WLR;
 
 
 const styles = StyleSheet.create({
   poster: {
     width: posterWidth,
     alignItems: 'center',
-    marginRight: 20 * WLR,
   },
   image: {
     width: posterWidth,
@@ -29,50 +29,49 @@ const styles = StyleSheet.create({
     width: posterWidth,
   },
 
-  square: {
-    width: squareWidth,
-    marginRight: 20 * WLR,
-  },
-  squareImage: {
-    width: squareWidth,
-    height: 100 * WLR,
-  }
 });
 
 
 const MoviePoster = ({ movie, ...rest }) => {
+
   return (
-    <TouchableOpacity {...rest} onPress={movie.onPressMethod}>
-      <Box style={styles.poster}>
-        <FastImage style={styles.image} source={{ uri: movie.image, priority: FastImage.priority.normal, }}></FastImage>
-        <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{movie.title}</Text>
-        <Rate style={styles.rate} rating={movie.rate}></Rate>
-      </Box>
-    </TouchableOpacity>
+    <Box {...rest}>
+      <TouchableOpacity onPress={movie.onPressMethod}>
+        <Box style={styles.poster}>
+          <FastImage style={styles.image} source={{ uri: movie.image }}></FastImage>
+          <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{movie.title}</Text>
+          <Rate style={styles.rate} rating={movie.rate}></Rate>
+        </Box>
+      </TouchableOpacity>
+    </Box>
   );
 };
 
 const RolePoster = ({ role, ...rest }) => {
 
   return (
-    <TouchableOpacity {...rest} onPress={role.onPressMethod}>
-      <Box style={styles.poster}>
-        <FastImage style={styles.image} source={{ uri: role.cover, priority: FastImage.priority.normal, }}></FastImage>
-        <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{role.name}</Text>
-        <Text variant='desc3' ellipsizeMode='tail' numberOfLines={1}>{role.role}</Text>
-      </Box>
-    </TouchableOpacity>
+    <Box {...rest}>
+      <TouchableOpacity onPress={role.onPressMethod}>
+        <Box style={styles.poster}>
+          <FastImage style={styles.image} source={{ uri: role.cover }}></FastImage>
+          <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{role.name}</Text>
+          <Text variant='desc3' ellipsizeMode='tail' numberOfLines={1}>{role.role}</Text>
+        </Box>
+      </TouchableOpacity>
+    </Box>
   );
 };
 
 const PhotoPoster = ({ photo, ...rest }) => {
 
   return (
-    <TouchableOpacity {...rest} onPress={photo.onPressMethod}>
-      <Box style={styles.square}>
-        <FastImage style={styles.squareImage} source={{ uri: photo.uri, priority: FastImage.priority.normal, }}></FastImage>
-      </Box>
-    </TouchableOpacity>
+    <Box {...rest}>
+      <TouchableOpacity onPress={photo.onPressMethod}>
+        <Box style={{ height: photoHeight }}>
+          <AutoHeightImage style={{ height: photoHeight }} source={{ uri: photo.uri }}></AutoHeightImage>
+        </Box>
+      </TouchableOpacity>
+    </Box>
   );
 
 };

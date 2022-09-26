@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react'
-import { RefreshControl, ScrollView } from "react-native";
-import * as api from '../../api/APIUtils'
-import { getMovieHotGaia, getMovieShowing, getTvHot, getTvVarietyShow } from '../../api/PublicApi'
+import { ScrollView } from "react-native";
 
+import { storage } from '../../utils';
 import { Box, Loading } from '../../theme/base'
 import PosterScrollList from '../../components/common/PosterScrollList'
 import { MoviePoster } from '../../components/common/Poster'
@@ -12,13 +11,11 @@ import SearchBar from '../../components/common/SearchBar'
 export default ({ route, navigation }) => {
 
   const [recentHots, setRecentHots] = useState(new Array());
-  const [loading, setLoading] = useState(true);
 
 
   useEffect(() => {
     getRcentHots();
   }, []);
-
 
 
   const format = (data) => {
@@ -36,39 +33,34 @@ export default ({ route, navigation }) => {
         }),
       }
     })
-
   }
 
   const getRcentHots = async () => {
-    setLoading(true);
     let curRecentHots = new Array();
 
-    let data = await api.get(getMovieHotGaia(), {}, 'public');
+    let data = await storage.load({ key: 'hot', id: 'movieHotGaia' });
     curRecentHots.push({
       title: '豆瓣热门',
       moviePosters: format(data)
     });
-    data = await api.get(getMovieShowing(), {}, 'public');
+    data = await storage.load({ key: 'hot', id: 'movieShowing' });
     curRecentHots.push({
       title: '正在上映',
       moviePosters: format(data)
     });
 
-    data = await api.get(getTvHot(), {}, 'public');
+    data = await storage.load({ key: 'hot', id: 'tvHot' });
     curRecentHots.push({
       title: '热门剧集',
       moviePosters: format(data)
     });
-    data = await api.get(getTvVarietyShow(), {}, 'public');
+    data = await storage.load({ key: 'hot', id: 'tvVarietyShow' });
     curRecentHots.push({
       title: '热门综艺',
       moviePosters: format(data)
     });
 
     setRecentHots(curRecentHots);
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
   }
 
 
@@ -76,19 +68,20 @@ export default ({ route, navigation }) => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      // refreshControl={
-      //   <RefreshControl
-      //     refreshing={loading}
-      //     onRefresh={getRcentHots}
-      //     title="正在加载中..."
-      //   />}
+    // refreshControl={
+    //   <RefreshControl
+    //     refreshing={loading}
+    //     onRefresh={getRcentHots}
+    //     title="正在加载中..."
+    //   />}
     >
       <Box paddingVertical='m'>
         <SearchBar
           onSubmitMethod={(keyword) => navigation.navigate('NoTabScreen', {
             screen: 'SearchResult',
-            params:{
-            keyword: keyword,}
+            params: {
+              keyword: keyword,
+            }
           })}
         />
 
@@ -98,7 +91,7 @@ export default ({ route, navigation }) => {
           {
             recentHots?.map((hotList) =>
               <PosterScrollList marginVertical='s' key={hotList.title} title={hotList.title} posterItems={hotList.moviePosters?.map((movie) =>
-                <MoviePoster key={movie.id} movie={movie} />
+                <MoviePoster marginRight='m' key={movie.id} movie={movie} />
               )}></PosterScrollList>
             )
           }

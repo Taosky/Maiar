@@ -1,19 +1,12 @@
-import { Dimensions,Alert } from 'react-native'
-
-const WLR = Dimensions.get('window').width / 375;
-
-const alert404 = (navigation=null) => Alert.alert(
-  '请求失败',
-  '数据不存在',
-  [
-    {
-      text: "OK",
-      onPress: () => navigation?.goBack(),
-      style: "default",
-    },
-  ]);
+import { WLR, alert404 } from "./ui";
+import storage from "./storage";
+import { timestampIntervalToSunday, timestampIntervalToTomorrow, sleep } from "./others";
 
 export {
   WLR,
   alert404,
+  storage,
+  timestampIntervalToSunday,
+  timestampIntervalToTomorrow,
+  sleep,
 }
