@@ -62,7 +62,7 @@ export default ({ route, navigation }) => {
               </Text>
             </Box>
             <PosterWall marginVertical='s' title={'相关作品'} posterItems={
-              celebrity?.movies?.map((movie, index) => <MoviePoster key={index} movie={movie} />)
+              celebrity?.movies?.map((movie, index) => <MoviePoster marginHorizontal='s' key={index} movie={movie} />)
             } />
           </Box>
         </FadeView>
