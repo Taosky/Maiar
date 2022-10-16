@@ -9,8 +9,7 @@ function getTodayStr() {
   if (strDate >= 0 && strDate <= 9) {
     strDate = "0" + strDate;
   }
-  return date.getFullYear() + nowMonth + strDate;
-
+  return `${date.getFullYear()}${nowMonth}${strDate}`;
 }
 
 const getMovieHotGaia = () => {

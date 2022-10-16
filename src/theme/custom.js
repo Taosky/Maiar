@@ -8,16 +8,21 @@ const palette = {
   blackLess: '#272729',
   grey: '#808080',
   darkStoneGrey: '#23272E',
-  darkStoneGreyRGBWithAlpha: 'rgba(35,39,46,1)',
   darkStoneGreyLess: '#2d3339',
   gainsboroughGrey: '#D8D8D8',
   darkStoneGreyLessLess: '#313940',
   whiteSmokeLess: '#F0F2F3',
   whiteSmoke: '#F2F2F2',
-  whhiteSmokeRGBWithAlpha: 'rgba(242,242,242,1)',
   whiteSmokeMore: '#E5E5E7',
   whiteSmokeMoreMore: '#d5d5d5',
   orange: '#ff9933',
+  moonYellow: '#FBDC40',
+  slateGray: '#708090',
+  lightSteelBlue: '#B0C4DE',
+  sageBlue: '#4681DE',
+  lightBlue: '#E9F3FF',
+  leafGreen: '#55B74C',
+  lightGreen: '#EEF8E8',
 };
 
 export const theme = {
@@ -28,10 +33,17 @@ export const theme = {
     card: palette.white,
     subcard: palette.whiteSmokeMoreMore,
     text: palette.darkStoneGrey,
+    desc:palette.darkStoneGreyLessLess,
     border: palette.gainsboroughGrey,
     notification: palette.orangeRed,
-    backdropMask: palette.whhiteSmokeRGBWithAlpha,
     cardBackground: palette.whiteSmokeMore,
+    enableBackground: palette.slateGray,
+    disableBackground: palette.lightSteelBlue,
+    movieText: palette.sageBlue,
+    movieBorder: palette.lightBlue,
+    tvText: palette.leafGreen,
+    tvBorder: palette.lightGreen,
+    tag: palette.moonYellow,
   },
   spacing: {
     ss: 4 * WLR,
@@ -138,7 +150,8 @@ export const theme = {
     rankNo: {
       fontWeight: 'bold',
       color: palette.orange,
-    }
+    },
+
   },
 };
 
@@ -151,10 +164,17 @@ export const darkTheme = {
     card: palette.darkStoneGreyLess,
     subcard: palette.darkStoneGreyLess,
     text: palette.whiteSmokeMore,
+    desc:palette.whiteSmokeMoreMore,
     border: palette.blackLess,
     notification: palette.orangeRed,
-    backdropMask: palette.darkStoneGreyRGBWithAlpha,
     cardBackground: palette.darkStoneGreyLessLess,
+    enableBackground: palette.slateGray,
+    disableBackground: palette.lightSteelBlue,
+    movieText: palette.sageBlue,
+    movieBorder: palette.lightBlue,
+    tvText: palette.leafGreen,
+    tvBorder: palette.lightGreen,
+    tag: palette.moonYellow,
   },
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, RefreshControl } from 'react-native';
 
 import { storage } from '../../utils';
 import { Box, Text } from '../../theme/base';
@@ -30,8 +30,11 @@ export default ({ route, navigation }) => {
     });
   }
 
-  const getCelebrityDetail = async () => {
+  const getCelebrityDetail = async (refresh = false) => {
     setLoading(true);
+    if (refresh) {
+      await storage.remove({ key: 'celebrity', id: cid })
+    }
     const data = await storage.load({ key: 'celebrity', id: cid });
     const movies = data?.movies;
     data.movies = formatedMovies(movies);
@@ -44,8 +47,13 @@ export default ({ route, navigation }) => {
 
   return (
     <Box>
-      <ScrollView>
-
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => { getCelebrityDetail(refresh = true); }}
+          />}
+      >
         <FadeView show={!loading}>
           <Box padding='m'>
             <Box marginTop='m' justifyContent='center' flexDirection='row'>

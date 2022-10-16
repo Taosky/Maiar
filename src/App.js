@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Appearance } from 'react-native'
-import { NavigationContainer, Stack } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { theme, darkTheme } from './theme/custom';
@@ -17,9 +17,6 @@ import RankDetailScreen from './screens/explore/rankDetail'
 
 Icon.loadFont()
 const colorTheme = Appearance.getColorScheme();
-
-
-
 
 const App = () => {
   const [darkMode, setDarkMode] = useState(colorTheme === 'dark' ? true : false);

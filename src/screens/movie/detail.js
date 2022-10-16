@@ -1,20 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, TouchableOpacity, StyleSheet, Image, Linking, Alert } from 'react-native';
-
+import { ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Image, Linking, Alert, TextInput } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
 import Modal from "react-native-modal";
 import { Box, Text } from '../../theme/base';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '@react-navigation/native';
 import ImageView from "react-native-image-viewing";
-import { storage, alert404 } from '../../utils';
+import InputTags from "react-native-tags";
+import { storage, alert404, sleep } from '../../utils';
 import PosterScrollList from '../../components/common/PosterScrollList'
-
 import Backdrop from '../../components/common/Backdrop';
 import { MoviePoster, RolePoster, PhotoPoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
+import { readWatchStatus, writeWatchStatus } from "../../utils";
 
 
-const MyButton = ({ title, onPressMethod, ...rest }) => {
+const WatchStatusButton = ({ mid, status, setWatchShow, ...rest }) => {
+  const { colors, } = useTheme();
+  const TOWATCH = 0;
+
+  const BtnText = !status ? '未标记' : (status.value === TOWATCH ? '已想看' : '已看过');
+
+  return (
+    <TouchableOpacity onPress={() => setWatchShow(true)}>
+      <Box {...rest} paddingVertical='s' paddingHorizontal='m' style={{ borderRadius: 5, backgroundColor: status ? colors.enableBackground : colors.disableBackground }}>
+        <Text variant='button'>{BtnText}</Text>
+      </Box>
+    </TouchableOpacity>
+  )
+}
+
+const CommonButton = ({ title, onPressMethod, ...rest }) => {
   const { colors, } = useTheme();
   return (
     <TouchableOpacity onPress={onPressMethod}>
@@ -22,20 +38,142 @@ const MyButton = ({ title, onPressMethod, ...rest }) => {
         <Text variant='button' color={colors.text} >{title}</Text>
       </Box>
     </TouchableOpacity>
-
   )
 }
 
-const ButtonBox = ({ navigation, vendors, trailer, douban_link, imdb_link, setVendorShow, ...rest }) => {
+const ButtonBox = ({ navigation, mid, vendors, trailer, douban_link, imdb_link, setVendorShow, watchStatus, setWatchShow, ...rest }) => {
   return (
     <Box>
       <Box flexDirection='row' {...rest}>
-        {vendors?.length > 0 && <MyButton marginRight='s' title='片源' onPressMethod={() => { setVendorShow(true); }} />}
-        {trailer && <MyButton marginRight='s' title='预告' onPressMethod={() => navigation.navigate('WebView', { uri: trailer, title: '预告' })} />}
-        {douban_link && <MyButton marginRight='s' title='豆瓣' onPressMethod={() => navigation.navigate('WebView', { uri: douban_link, title: '豆瓣' })} />}
-        {imdb_link && <MyButton marginRight='s' title='IMDB' onPressMethod={() => navigation.navigate('WebView', { uri: imdb_link, title: 'IMDB' })} />}
+        <WatchStatusButton mid={mid} status={watchStatus} setWatchShow={setWatchShow} marginRight='s' />
+        {vendors?.length > 0 && <CommonButton marginRight='s' title='片源' onPressMethod={() => { setVendorShow(true); }} />}
+        {trailer && <CommonButton marginRight='s' title='预告' onPressMethod={() => navigation.navigate('WebView', { uri: trailer, title: '预告' })} />}
+        {douban_link && <CommonButton marginRight='s' title='豆瓣' onPressMethod={() => navigation.navigate('WebView', { uri: douban_link, title: '豆瓣' })} />}
+        {imdb_link && <CommonButton marginRight='s' title='IMDB' onPressMethod={() => navigation.navigate('WebView', { uri: imdb_link, title: 'IMDB' })} />}
       </Box>
     </Box>
+  )
+}
+
+const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, show }) => {
+  const { colors, } = useTheme();
+  const WATCHED = 1;
+  const TOWATCH = 0;
+  const NOWATCH = -1;
+  const [select, setSelect] = useState(NOWATCH);
+  const [comment, setComment] = useState('');
+  const [tags, setTags] = useState([]);
+
+
+  const initStatus = () => {
+    if (status) {
+      console.log(status)
+      setSelect(status.value);
+      setComment(status.comment);
+      if (status.value !== WATCHED && status.tags instanceof Array && status.tags.length === 0) {
+        setTags(userTags);
+      } else {
+        setTags(status.tags);
+      }
+    } else {
+      setSelect(NOWATCH);
+      setTags(userTags);
+    }
+  }
+
+  useEffect(() => {
+    if (!mid) {
+      return;
+    }
+    initStatus();
+  }, [show,]);
+
+  const saveStatus = () => {
+    try {
+      writeWatchStatus(mid, select, tags, comment);
+      Alert.alert('保存成功', '');
+      setWatchShow(false);
+    }
+    catch (err) {
+      console.log(err);
+      Alert.alert('保存出错', '', [{
+        text: "好",
+        style: "destructive",
+      }]);
+    }
+    sleep(300);
+    updateStatusMethod();
+  }
+  return (
+    <Modal
+      isVisible={show}
+      backdropOpacity={0.5}
+      onBackdropPress={() => setWatchShow(false)}
+      style={{ margin: 0, }}
+    >
+      <Box padding='m' style={{ backgroundColor: colors.cardBackground, borderRadius: 10, padding: 8 }} >
+        <Box padding='m' flexDirection='row' justifyContent='space-around' >
+          <Box flexDirection='row'>
+            <CheckBox
+              style={{ width: 18, height: 18, marginRight: 10 }}
+              value={select === TOWATCH ? true : false}
+              onValueChange={(value) =>
+                value !== false ?
+                  setSelect(0) : setSelect(NOWATCH)} />
+            <Text variant='title1'>想看</Text>
+          </Box>
+          <Box flexDirection='row'>
+            <CheckBox
+              style={{ width: 18, height: 18, marginRight: 10 }}
+              value={select === WATCHED ? true : false}
+              onValueChange={(value) =>
+                value !== false ?
+                  setSelect(1) : setSelect(NOWATCH)} />
+            <Text variant='title1'>已看</Text>
+          </Box>
+        </Box>
+        {show && select === WATCHED &&
+          <Box>
+            <InputTags
+              textInputProps={{
+                placeholder: "自定义标签(空格添加)"
+              }}
+              initialText=""
+              initialTags={tags}
+              onChangeTags={tags => setTags(tags)}
+              containerStyle={{ justifyContent: "center" }}
+              inputStyle={{ backgroundColor: colors.subcard, color: colors.text, borderRadius: 4, }}
+              renderTag={({ tag, index, onPress, deleteTagOnPress, readonly }) => (
+                <Box margin='ss'>
+                  <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
+                    <Box flexDirection='row' alignItems='baseline' style={{ backgroundColor: colors.tag, borderRadius: 3, padding: 4 }}>
+                      <Text variant='subtitle4' style={{ color: 'black' }}>{tag}</Text>
+                      <Text variant='subtitle5' style={{ color: 'black' }}> X</Text>
+                    </Box>
+                  </TouchableOpacity>
+                </Box>
+              )}
+            />
+          </Box>
+        }
+        <Box>
+          {
+            select === WATCHED &&
+            <Box padding='m'>
+              <TextInput
+                multiline={true}
+                style={{ height: 80, borderColor: 'gray', borderWidth: 1, borderRadius: 4, color: colors.text }}
+                onChangeText={text => setComment(text)}
+                value={comment}
+                placeholder='写点想法...'
+                placeholderTextColor={colors.desc}
+              />
+            </Box>
+          }
+          <CommonButton title='保存' onPressMethod={() => saveStatus()} />
+        </Box>
+      </Box>
+    </Modal>
   )
 }
 
@@ -61,28 +199,30 @@ const VendorPopup = ({ vendors, show, setVendorShow }) => {
   }
   return (
     <Modal
-      animationType="slide"
       isVisible={show}
       backdropOpacity={0.5}
       onBackdropPress={() => setVendorShow(false)}
-      style={{ bottom: 0, flex: 0, margin: 0, width: '100%', position: 'absolute', backgroundColor: colors.cardBackground, borderRadius: 10, padding: 8 }}
+      style={{ justifyContent: 'flex-end', margin: 0, }}
     >
-      {
-        vendors?.length > 0 && vendors.map((vendor, index) =>
-          <TouchableOpacity key={index} onPress={() => { tryToOpenUri(vendor.uri, vendor.url) }}>
-            <Box flexDirection='row' padding='m' justifyContent='space-around'>
-              <Box flexDirection='row'>
-                <Image alignSelf='baseline' style={{ height: 16, width: 16, marginHorizontal: 4 }} source={{ uri: vendor.icon }} />
-                <Text style={{ textAlign: 'left' }} variant='title2'>
-                  {vendor.title}{vendor.payments?.length > 0 && <Text variant='desc2'>（{vendor.payments[0].method}）</Text>}
-                </Text>
-              </Box>
-              {vendor.episodes_info !== '' && <Text variant='subtitle2'>{vendor.episodes_info}</Text>}
+      <Box style={{ backgroundColor: colors.cardBackground, borderRadius: 10, padding: 8 }}>
+        {
+          vendors?.length > 0 && vendors.map((vendor, index) =>
+            <TouchableOpacity key={index} onPress={() => { tryToOpenUri(vendor.uri, vendor.url) }}>
+              <Box flexDirection='row' padding='m' justifyContent='space-around'>
+                <Box flexDirection='row'>
+                  <Image alignSelf='baseline' style={{ height: 16, width: 16, marginHorizontal: 4 }} source={{ uri: vendor.icon }} />
+                  <Text style={{ textAlign: 'left' }} variant='title2'>
+                    {vendor.title}{vendor.payments?.length > 0 && <Text variant='desc2'>（{vendor.payments[0].method}）</Text>}
+                  </Text>
+                </Box>
+                {vendor.episodes_info !== '' && <Text variant='subtitle2'>{vendor.episodes_info}</Text>}
 
-              <Icon alignSelf='baseline' size={14} color={colors.text} name='chevron-forward-outline' />
-            </Box>
-          </TouchableOpacity>)
-      }
+                <Icon alignSelf='baseline' size={14} color={colors.text} name='chevron-forward-outline' />
+              </Box>
+            </TouchableOpacity>)
+        }
+
+      </Box>
     </Modal>
 
   )
@@ -331,15 +471,15 @@ const Recomendations = ({ mid, navigation, ...rest }) => {
 
 export default ({ route, navigation }) => {
   const { colors } = useTheme();
-  const { mid } = route.params;
-  const [movie, setMovie] = useState(new Object);
+  const [headerOpacity, setHeaderOpacity] = useState(0);
   const [loading, setLoading] = useState(true);
   const [vendorShow, setVendorShow] = useState(false);
-  const [headerOpacity, setHeaderOpacity] = useState(0);
+  const [watchShow, setWatchShow] = useState(false);
 
-  useEffect(() => {
-    getMovieDetail();
-  }, []);
+  const { mid } = route.params;
+  const [movie, setMovie] = useState(new Object);
+  const [watchStatus, setWatchStatus] = useState(null);
+
 
   // 设置标题栏title、透明度
   useEffect(() => {
@@ -366,10 +506,39 @@ export default ({ route, navigation }) => {
         />
       ),
     });
-  }, [headerOpacity,])
+  }, [headerOpacity,]);
 
+  useEffect(() => {
+    if (!mid) {
+      return;
+    }
+    getMovie();
+    getWatchStatus();
+  }, []);
 
-  const getRoleCover = (role) => {
+  const formatRoleData = (roles, type) => {
+    if (!roles) {
+      return null;
+    }
+    return roles.map((role) => {
+      const role_ = role.character ? role.character : type;
+      return {
+        id: role.id ? role.id : '-1',
+        name: role.name ? role.name : '未知',
+        role: role_,
+        cover: genRoleCoverUrl(role),
+        onPressMethod: () => {
+          if (role.id) {
+            navigation.push('CelebrityDetail', {
+              cid: role.id,
+            })
+          }
+        }
+      }
+    });
+  }
+
+  const genRoleCoverUrl = (role) => {
     if (role.cover_url) {
       return role.cover_url;
     } else if (role.avatar) {
@@ -382,28 +551,6 @@ export default ({ route, navigation }) => {
     return 'https://s2.loli.net/2022/08/16/W5si62xlkGyBuep.png'
   }
 
-  const formatRoleData = (roles, type) => {
-    if (!roles) {
-      return null;
-    }
-    return roles.map((role) => {
-      const role_ = role.character ? role.character : type;
-      return {
-        id: role.id ? role.id : '-1',
-        name: role.name ? role.name : '未知',
-        role: role_,
-        cover: getRoleCover(role),
-        onPressMethod: () => {
-          if (role.id) {
-            navigation.push('CelebrityDetail', {
-              cid: role.id,
-            })
-          }
-        }
-      }
-    });
-  }
-
   const formatMovieData = (current) => ({
     id: current.id,
     backdrop: (current.extra?.backdrops && current.extra?.backdrops.length > 0) ? current.extra.backdrops[0].replace(/original/i, 'w1066_and_h600_bestv2') : null,
@@ -414,6 +561,7 @@ export default ({ route, navigation }) => {
     rate: current.rating ? Number(current.rating.value) : 0,
     duration: current.durations?.length > 0 ? current.durations[0] : null,
     tags: current.tags,
+    user_tags: current.card_subtitle.replace(/ \/ /g, ' ').split(' '),
     intro: current.intro,
     trailer: current.trailer ? current.trailer.video_url : null,
     vendors: current.vendors,
@@ -426,8 +574,11 @@ export default ({ route, navigation }) => {
     akas: current.aka,
   })
 
-  const getMovieDetail = async () => {
+  const getMovie = async (refresh = false) => {
     setLoading(true);
+    if (refresh) {
+      await storage.remove({ key: 'movie', id: mid });
+    }
     let data = await storage.load({ key: 'movie', id: mid });
     if (data?.code === 404) {
       alert404(navigation);
@@ -436,12 +587,22 @@ export default ({ route, navigation }) => {
     setMovie(formated_movie);
     setTimeout(() => {
       setLoading(false);
-    }, 100)
+    }, 80)
+  }
+
+  const getWatchStatus = async () => {
+    const statusInStorage = await readWatchStatus(mid);
+    setWatchStatus(statusInStorage);
   }
 
   return (
     <Box>
       <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => { getMovie(refresh = true); }}
+          />}
         onScroll={(event) => {
           const scrollY = event.nativeEvent.contentOffset.y;
           setHeaderOpacity(((scrollY - 0) * (1 - 0)) / (100 - 0) + 0);
@@ -457,7 +618,7 @@ export default ({ route, navigation }) => {
             <RatingInfo marginVertical='ss' mid={movie.id} />
             <Tags marginVertical='ss' tags={movie.tags} />
             <Directors marginVertical='ss' directors={movie.directors} />
-            <ButtonBox marg33inVertical='ss' navigation={navigation} vendors={movie.vendors} trailer={movie.trailer} douban_link={movie.douban_link} imdb_link={movie.imdb_link} setVendorShow={setVendorShow} />
+            <ButtonBox marg33inVertical='ss' navigation={navigation} mid={movie.id} vendors={movie.vendors} trailer={movie.trailer} douban_link={movie.douban_link} imdb_link={movie.imdb_link} setVendorShow={setVendorShow} watchStatus={watchStatus} setWatchShow={setWatchShow} />
             <Intro marginVertical='s' text={movie.intro} />
             <Roles marginVertical='ss' actors={movie.actors} directors={movie.directors} />
             <Photos marginVertical='ss' mid={movie.id} />
@@ -466,6 +627,7 @@ export default ({ route, navigation }) => {
         </FadeView>
       </ScrollView >
       <VendorPopup show={vendorShow} vendors={movie.vendors} setVendorShow={setVendorShow} />
+      <WatchPopup status={watchStatus} show={watchShow} mid={movie.id} userTags={movie.user_tags} setWatchShow={setWatchShow} updateStatusMethod={getWatchStatus} />
 
     </Box>
   )

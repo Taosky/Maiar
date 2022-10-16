@@ -9,7 +9,7 @@ export default ({ title, posterItems, ...rest }) => {
       <Box marginBottom='s'>
         <Text variant='title2'>{title}</Text>
       </Box>
-        <Box style={{ marginLeft: 10 * WLR }} flexDirection='row' flexWrap='wrap' >
+        <Box flexDirection='row' flexWrap='wrap' justifyContent='space-between' >
           {posterItems}
         </Box>
     </Box>

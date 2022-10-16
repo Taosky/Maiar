@@ -68,12 +68,6 @@ export default ({ route, navigation }) => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-    // refreshControl={
-    //   <RefreshControl
-    //     refreshing={loading}
-    //     onRefresh={getRcentHots}
-    //     title="正在加载中..."
-    //   />}
     >
       <Box paddingVertical='m'>
         <SearchBar

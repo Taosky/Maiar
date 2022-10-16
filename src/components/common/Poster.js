@@ -4,8 +4,6 @@ import FastImage from 'react-native-fast-image'
 import { Box, Text } from '../../theme/base'
 import Rate from './StarRating'
 import { WLR, } from '../../utils'
-import AutoHeightImage from './AutoHeightImage';
-
 
 const posterWidth = 90 * WLR;
 const photoHeight = 100 * WLR;
@@ -68,7 +66,7 @@ const PhotoPoster = ({ photo, ...rest }) => {
     <Box {...rest}>
       <TouchableOpacity onPress={photo.onPressMethod}>
         <Box style={{ height: photoHeight }}>
-          <AutoHeightImage style={{ height: photoHeight }} source={{ uri: photo.uri }}></AutoHeightImage>
+          <FastImage style={{ height: photoHeight, width: photoHeight }} source={{ uri: photo.uri }}></FastImage>
         </Box>
       </TouchableOpacity>
     </Box>

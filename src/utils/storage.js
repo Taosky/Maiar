@@ -24,7 +24,7 @@ const storage = new Storage({
   storageBackend: AsyncStorage,
 
   // 数据过期时间，默认一整天（1000 * 3600 * 24 毫秒），设为null则永不过期
-  defaultExpires: 1000 * 3600 * 24 * 30,
+  defaultExpires: null,
 
   // 读写时在内存中缓存数据。默认启用。
   enableCache: true,
@@ -156,7 +156,7 @@ const storage = new Storage({
     },
     async rank(params) {
       const { id, syncParams: { page, limit } } = params;
-      const type_ = id.replace(/-/g,'_').replace(/\+\d+/, '');
+      const type_ = id.replace(/-/g, '_').replace(/\+\d+/, '');
       const data = await api.get(getRankMovies(type_), { page: page, limit: limit }, 'public');
       console.log(`rank ${id} sync resp...`);
 

@@ -1,34 +1,23 @@
 import React from 'react';
-import { Image } from 'react-native'
-import { SrcOverComposition, LinearGradient, } from 'react-native-image-filter-kit'
 import { useTheme } from '@react-navigation/native';
 import { Box } from '../../theme/base'
 import { WLR } from '../../utils/index'
+import FastImage from 'react-native-fast-image';
 
 
 export default ({ img, landscape }) => {
-  const { colors } = useTheme();
+  const { dark } = useTheme();
 
   return (
-    <Box style={{ marginTop: landscape ? 0 : -50,marginBottom: landscape ? -20 : -140}}>
+    <Box style={{ marginTop: landscape ? 0 : -50, marginBottom: landscape ? -20 : -140 }}>
       {img ?
-        <SrcOverComposition
-          resizeCanvasTo={'dstImage'}
-          dstImage={
-            <Image
-              style={{ width: 375 * WLR, height: landscape ? 210 * WLR : 525 * WLR }}
-              source={{ uri: img, cache: 'force-cache' }}
-            />
+        <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR }} source={{ uri: img }}>
+          {dark ?
+            <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR, resizeMode: 'stretch' }} source={require('./backdrop/img/backdrop-dark.png')} />
+            :
+            <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR, resizeMode: 'stretch' }} source={require('./backdrop/img/backdrop-light.png')} />
           }
-          srcAnchor={{ y: 0 }}
-          srcImage={
-            <LinearGradient
-              start={{ x: 0, y: '100h' }}
-              end={{ x: 0, y: 0 }}
-              colors={['transparent', colors.backdropMask]}
-            />
-          }
-        />
+        </FastImage>
         : <Box marginTop='xxxl'></Box>
       }
     </Box>
