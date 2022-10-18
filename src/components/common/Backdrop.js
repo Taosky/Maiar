@@ -13,9 +13,9 @@ export default ({ img, landscape }) => {
       {img ?
         <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR }} source={{ uri: img }}>
           {dark ?
-            <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR, resizeMode: 'stretch' }} source={require('./backdrop/img/backdrop-dark.png')} />
+            <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR, resizeMode: 'stretch' }} source={landscape ? require('./backdrop/img/backdrop-dark-280.png') : require('./backdrop/img/backdrop-dark-525.png')} />
             :
-            <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR, resizeMode: 'stretch' }} source={require('./backdrop/img/backdrop-light.png')} />
+            <FastImage style={{ width: 375 * WLR, height: landscape ? 280 * WLR : 525 * WLR, resizeMode: 'stretch' }} source={landscape ? require('./backdrop/img/backdrop-light-280.png') : require('./backdrop/img/backdrop-light-525.png')} />
           }
         </FastImage>
         : <Box marginTop='xxxl'></Box>

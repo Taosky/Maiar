@@ -59,21 +59,21 @@ const Loading = (...rest) => {
   )
 }
 
-const Popup = (show, ...rest) => {
-  const { colors, spacing } = useTheme();
-  return (
-    <RNView  style={{zIndex:100,backgroundColor:'white'}} {...rest}>
-      <Modal
-        animationType="slide"
-        visible={show}
-      ><Text>1123123sdssssdadaeasddaewe23</Text></Modal>
-    </RNView>
-  )
-}
+// const Popup = (show, ...rest) => {
+//   const { colors, spacing } = useTheme();
+//   return (
+//     <RNView  style={{zIndex:100,backgroundColor:'white'}} {...rest}>
+//       <Modal
+//         animationType="slide"
+//         visible={show}
+//       ><Text></Text></Modal>
+//     </RNView>
+//   )
+// }
 
 export {
   Box,
   Text,
   Loading,
-  Popup,
+  // Popup,
 }

@@ -1,7 +1,7 @@
 import { WLR, alert404 } from "./ui";
 import storage from "./storage";
 import { timestampIntervalToSunday, timestampIntervalToTomorrow, getDateStrHyphen, sleep } from "./others";
-import { readWatchStatus, writeWatchStatus, removeWatchStatus, readWatchedValuesInCalendar } from "./watch";
+import { readWatchStatus, writeWatchStatus, removeWatchStatus, readWatchedValuesInCalendar, readStatistics } from "./watch";
 
 export {
   WLR,
@@ -15,4 +15,5 @@ export {
   readWatchStatus,
   removeWatchStatus,
   readWatchedValuesInCalendar,
+  readStatistics,
 }

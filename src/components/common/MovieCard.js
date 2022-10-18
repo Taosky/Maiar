@@ -45,10 +45,10 @@ export default ({ item, ...rest }) => {
             </Box>
             <Box marginVertical='ss' flexDirection='row' flexWrap='wrap'>
               <Rate rating={item.rating?.value} />
-              <Box marginLeft='ss'><Text>{item.rating?.value !== 0 ? item.rating?.value : '无评分'}</Text></Box>
+              <Box marginLeft='ss'><Text>{item.rating?.value !== 0 ? item.rating?.value.toFixed(1) : '无评分'}</Text></Box>
             </Box>
             <Text numberOfLines={2} ellipsizeMode='tail' style={{ verticalAlign: 'top' }} >
-              {item.is_tv && <Tag color={item.is_tv ? 'blue' : 'orange'} text={item.is_tv ? '剧集' : '电影'} />}
+              {(item.is_tv === true || item.is_tv === false) && <Tag color={item.is_tv ? 'blue' : 'orange'} text={item.is_tv ? '剧集' : '电影'} />}
               <Text variant='desc3'>  {item.card_subtitle}</Text>
             </Text>
           </Box>

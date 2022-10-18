@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Image, Linking, Alert, TextInput } from 'react-native';
+import { ScrollView, RefreshControl, TouchableOpacity, TouchableWithoutFeedback,Keyboard, StyleSheet, Image, Linking, Alert, TextInput } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import Modal from "react-native-modal";
+import Modal from 'react-native-modal';
 import { Box, Text } from '../../theme/base';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '@react-navigation/native';
-import ImageView from "react-native-image-viewing";
-import InputTags from "react-native-tags";
+import ImageView from 'react-native-image-viewing';
+import InputTags from 'react-native-tags';
 import { storage, alert404, sleep } from '../../utils';
 import PosterScrollList from '../../components/common/PosterScrollList'
 import Backdrop from '../../components/common/Backdrop';
 import { MoviePoster, RolePoster, PhotoPoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
-import { readWatchStatus, writeWatchStatus } from "../../utils";
+import { readWatchStatus, writeWatchStatus } from '../../utils';
 
 
 const WatchStatusButton = ({ mid, status, setWatchShow, ...rest }) => {
@@ -67,7 +67,6 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
 
   const initStatus = () => {
     if (status) {
-      console.log(status)
       setSelect(status.value);
       setComment(status.comment);
       if (status.value !== WATCHED && status.tags instanceof Array && status.tags.length === 0) {
@@ -97,8 +96,8 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
     catch (err) {
       console.log(err);
       Alert.alert('保存出错', '', [{
-        text: "好",
-        style: "destructive",
+        text: '好',
+        style: 'destructive',
       }]);
     }
     sleep(300);
@@ -111,68 +110,68 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
       onBackdropPress={() => setWatchShow(false)}
       style={{ margin: 0, }}
     >
-      <Box padding='m' style={{ backgroundColor: colors.cardBackground, borderRadius: 10, padding: 8 }} >
-        <Box padding='m' flexDirection='row' justifyContent='space-around' >
-          <Box flexDirection='row'>
-            <CheckBox
-              style={{ width: 18, height: 18, marginRight: 10 }}
-              value={select === TOWATCH ? true : false}
-              onValueChange={(value) =>
-                value !== false ?
-                  setSelect(0) : setSelect(NOWATCH)} />
-            <Text variant='title1'>想看</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <Box padding='m' style={{ backgroundColor: colors.cardBackground, borderRadius: 10, padding: 8 }} >
+          <Box padding='m' flexDirection='row' justifyContent='space-around' >
+            <Box flexDirection='row'>
+              <CheckBox
+                style={{ width: 18, height: 18, marginRight: 10 }}
+                value={select === TOWATCH ? true : false}
+                onValueChange={(value) =>
+                  value !== false ?
+                    setSelect(0) : setSelect(NOWATCH)} />
+              <Text variant='title1'>想看</Text>
+            </Box>
+            <Box flexDirection='row'>
+              <CheckBox
+                style={{ width: 18, height: 18, marginRight: 10 }}
+                value={select === WATCHED ? true : false}
+                onValueChange={(value) =>
+                  value !== false ?
+                    setSelect(1) : setSelect(NOWATCH)} />
+              <Text variant='title1'>已看</Text>
+            </Box>
           </Box>
-          <Box flexDirection='row'>
-            <CheckBox
-              style={{ width: 18, height: 18, marginRight: 10 }}
-              value={select === WATCHED ? true : false}
-              onValueChange={(value) =>
-                value !== false ?
-                  setSelect(1) : setSelect(NOWATCH)} />
-            <Text variant='title1'>已看</Text>
-          </Box>
-        </Box>
-        {show && select === WATCHED &&
-          <Box>
-            <InputTags
-              textInputProps={{
-                placeholder: "自定义标签(空格添加)"
-              }}
-              initialText=""
-              initialTags={tags}
-              onChangeTags={tags => setTags(tags)}
-              containerStyle={{ justifyContent: "center" }}
-              inputStyle={{ backgroundColor: colors.subcard, color: colors.text, borderRadius: 4, }}
-              renderTag={({ tag, index, onPress, deleteTagOnPress, readonly }) => (
-                <Box margin='ss'>
-                  <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
-                    <Box flexDirection='row' alignItems='baseline' style={{ backgroundColor: colors.tag, borderRadius: 3, padding: 4 }}>
-                      <Text variant='subtitle4' style={{ color: 'black' }}>{tag}</Text>
-                      <Text variant='subtitle5' style={{ color: 'black' }}> X</Text>
-                    </Box>
-                  </TouchableOpacity>
-                </Box>
-              )}
-            />
-          </Box>
-        }
-        <Box>
-          {
-            select === WATCHED &&
-            <Box padding='m'>
-              <TextInput
-                multiline={true}
-                style={{ height: 80, borderColor: 'gray', borderWidth: 1, borderRadius: 4, color: colors.text }}
-                onChangeText={text => setComment(text)}
-                value={comment}
-                placeholder='写点想法...'
-                placeholderTextColor={colors.desc}
+          {show && select === WATCHED &&
+            <Box>
+              <InputTags
+                textInputProps={{placeholder: '自定义标签(空格添加)'}}
+                initialText=''
+                initialTags={tags}
+                onChangeTags={tags => setTags(tags)}
+                containerStyle={{ justifyContent: 'center' }}
+                inputStyle={{ backgroundColor: colors.subcard, color: colors.text, borderRadius: 4, }}
+                renderTag={({ tag, index, onPress, deleteTagOnPress, readonly }) => (
+                  <Box margin='ss' key={`${tag}-${index}`}>
+                    <TouchableOpacity onPress={onPress}>
+                      <Box flexDirection='row' alignItems='baseline' style={{ backgroundColor: colors.tag, borderRadius: 3, padding: 4 }}>
+                        <Text variant='subtitle4' style={{ color: 'black' }}>{tag}</Text>
+                        <Text variant='subtitle5' style={{ color: 'black' }}> X</Text>
+                      </Box>
+                    </TouchableOpacity>
+                  </Box>
+                )}
               />
             </Box>
           }
-          <CommonButton title='保存' onPressMethod={() => saveStatus()} />
+          <Box>
+            {
+              select === WATCHED &&
+              <Box padding='m'>
+                <TextInput
+                  multiline={true}
+                  style={{ height: 80, borderColor: 'gray', borderWidth: 1, borderRadius: 4, color: colors.text }}
+                  onChangeText={text => setComment(text)}
+                  value={comment}
+                  placeholder='写点想法...'
+                  placeholderTextColor={colors.desc}
+                />
+              </Box>
+            }
+            <CommonButton title='保存' onPressMethod={() => saveStatus()} />
+          </Box>
         </Box>
-      </Box>
+      </TouchableWithoutFeedback>
     </Modal>
   )
 }
@@ -187,12 +186,12 @@ const VendorPopup = ({ vendors, show, setVendorShow }) => {
         Linking.openURL(uri)
       } else
         Alert.alert('App未安装', '是否从浏览器打开？', [{
-          text: "好",
+          text: '好',
           onPress: () => Linking.openURL(url),
-          style: "default",
+          style: 'default',
         }, {
-          text: "不了",
-          style: "cancel",
+          text: '不了',
+          style: 'cancel',
         },
         ]);
     });
@@ -280,7 +279,7 @@ const BasicInfo = ({ rate, duration, episodes_count, pubdate, akas, ...rest }) =
       }
       <Box flexDirection='row' >
         <Icon name='star' size={14} color='red' />
-        <Text numberOfLines={2} ellipsizeMode='tail'>{rate !== 0 ? rate : '无评分'}  {pubdate}  {duration} {episodes_count ? (episodes_count !== 0 && `共${episodes_count}集`) : ''}</Text>
+        <Text numberOfLines={2} ellipsizeMode='tail'>{rate !== 0 ? rate?.toFixed(1) : '无评分'}  {pubdate}  {duration} {episodes_count ? (episodes_count !== 0 && `共${episodes_count}集`) : ''}</Text>
       </Box>
     </Box>
   )
@@ -359,13 +358,13 @@ const Roles = ({ directors, actors, ...rest }) => {
 const ImageFooter = ({ imageIndex, imagesCount }) => (
   <Box style={{
     height: 64,
-    backgroundColor: "#00000077",
-    alignItems: "center",
-    justifyContent: "center"
+    backgroundColor: '#00000077',
+    alignItems: 'center',
+    justifyContent: 'center'
   }}>
     <Text style={{
       fontSize: 17,
-      color: "#FFF"
+      color: '#FFF'
     }}>{`${imageIndex + 1} / ${imagesCount}`}</Text>
   </Box>
 )

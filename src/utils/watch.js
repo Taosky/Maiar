@@ -1,9 +1,98 @@
 import storage from "./storage";
-import { getDateStrHyphen } from './others'
+import { getDateStrHyphen, sleep } from './others'
 
 const WATCHED = 1;
 const TOWATCH = 0;
 const NOWATCH = -1;
+
+
+const genStatistics = async () => {
+  // 半小时内不更新
+  try {
+    const lastStatistics = await storage.load({ key: 'statistics' });
+    if (Date.parse(new Date()) - lastStatistics.updatedAt < 1800000) {
+      console.log('skip statistic generation...')
+      return
+    }
+  } catch (error) {
+    console.log(error)
+  }
+
+  console.log('generating statistics...')
+  let total = 0;
+  let watched = { total: 0, tags: [] };
+  let watchedTags = [];
+  let towatchTags = [];
+  let toWatch = { total: 0, tags: [] };
+  let addedWatchedDict = {};
+  let addedTowatchDict = {};
+  try {
+    const watchDict = await storage.load({ key: 'watch' });
+    total = Object.keys(watchDict).length;
+    Object.keys(watchDict).forEach(mid => {
+      if (watchDict[mid]['value'] === WATCHED) {
+        watched['total'] += 1;
+      } else if (watchDict[mid]['value'] === TOWATCH) {
+        toWatch['total'] += 1;
+      }
+      if ('tags' in watchDict[mid]) {
+        watchDict[mid].tags.forEach(tag => {
+          if (watchDict[mid]['value'] === WATCHED) {
+            if (tag in addedWatchedDict) {
+              addedWatchedDict[tag] += 1;
+            } else {
+              addedWatchedDict[tag] = 1;
+            }
+          } else if (watchDict[mid]['value'] === TOWATCH) {
+            if (tag in addedTowatchDict) {
+              addedTowatchDict[tag] += 1;
+            } else {
+              addedTowatchDict[tag] = 1;
+            }
+          }
+        });
+      }
+
+    });
+    Object.keys(addedWatchedDict).forEach(tag => {
+      watchedTags.push({ tag: tag, count: addedWatchedDict[tag] });
+    });
+    watchedTags.sort((a, b) => { return b.count - a.count });
+
+    watched['tags'] = watchedTags.slice(0, 20);
+
+
+    Object.keys(addedTowatchDict).forEach(tag => {
+      towatchTags.push({ tag: tag, count: addedTowatchDict[tag] });
+    });
+    towatchTags.sort((a, b) => { return b.count - a.count })
+    toWatch['tags'] = towatchTags.slice(0, 20);
+
+  } catch (error) {
+    console.log(error)
+    return
+  }
+  console.log('statistics generated')
+  await storage.save({
+    key: 'statistics', data: {
+      total: total,
+      watched: watched,
+      toWatch: toWatch,
+      updatedAt: Date.parse(new Date()),
+    }
+  });
+}
+
+const readStatistics = async () => {
+  let lastStatistics = null;
+  try {
+    lastStatistics = await storage.load({ key: 'statistics' });
+  } catch (error) {
+    console.log(error);
+  }
+  return lastStatistics;
+}
+
 
 const readWatchedValuesInCalendar = async () => {
 
@@ -58,7 +147,11 @@ const writeWatchStatus = async (mid, value, tags, comment) => {
     watchDict[mid] = { 'value': value, 'timestamp': Date.parse(new Date()), 'tags': tags, 'comment': comment };
   }
 
-  await storage.save({ key: 'watch', data: watchDict })
+  await storage.save({ key: 'watch', data: watchDict });
+
+  // 保存观看状态后执行统计（暂定）
+  sleep(1000);
+  genStatistics();
 }
 
 const removeWatchStatus = async (mid) => {
@@ -76,4 +169,5 @@ export {
   writeWatchStatus,
   removeWatchStatus,
   readWatchedValuesInCalendar,
+  readStatistics,
 }
