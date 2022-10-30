@@ -38,7 +38,7 @@ const MoviePoster = ({ movie, ...rest }) => {
         <Box style={styles.poster}>
           <FastImage style={styles.image} source={{ uri: movie.image }}></FastImage>
           <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{movie.title}</Text>
-          <Rate style={styles.rate} rating={movie.rate}></Rate>
+          {movie.rate !=-2 && <Rate style={styles.rate} rating={movie.rate}></Rate>}
         </Box>
       </TouchableOpacity>
     </Box>

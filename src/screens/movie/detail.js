@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, RefreshControl, TouchableOpacity, TouchableWithoutFeedback,Keyboard, StyleSheet, Image, Linking, Alert, TextInput } from 'react-native';
+import { ScrollView, RefreshControl, TouchableOpacity, TouchableWithoutFeedback, Keyboard, StyleSheet, Image, Alert, TextInput } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
 import { Box, Text } from '../../theme/base';
@@ -12,8 +12,24 @@ import PosterScrollList from '../../components/common/PosterScrollList'
 import Backdrop from '../../components/common/Backdrop';
 import { MoviePoster, RolePoster, PhotoPoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
-import { readWatchStatus, writeWatchStatus } from '../../utils';
+import { readWatchStatus, writeWatchStatus, tryToOpenUri } from '../../utils';
+import { getSetting, } from '../../utils';
+import * as api from '../../api/APIUtils'
+import { getVideos, getUserInfo } from '../../api/ServerAPI'
 
+const PlayListButton = ({ show, onPressMethod, ...rest }) => {
+
+  return (
+    <Box>
+      {show &&
+        <Box {...rest} flexDirection='row'>
+          <CommonButton primary title='播放列表' onPressMethod={() => onPressMethod()} />
+        </Box>
+      }
+    </Box>
+
+  )
+}
 
 const WatchStatusButton = ({ mid, status, setWatchShow, ...rest }) => {
   const { colors, } = useTheme();
@@ -30,12 +46,12 @@ const WatchStatusButton = ({ mid, status, setWatchShow, ...rest }) => {
   )
 }
 
-const CommonButton = ({ title, onPressMethod, ...rest }) => {
+const CommonButton = ({ title, onPressMethod, primary, ...rest }) => {
   const { colors, } = useTheme();
   return (
     <TouchableOpacity onPress={onPressMethod}>
-      <Box paddingVertical='s' paddingHorizontal='m' {...rest} style={{ borderRadius: 5, backgroundColor: colors.cardBackground }}>
-        <Text variant='button' color={colors.text} >{title}</Text>
+      <Box paddingVertical='s' paddingHorizontal='m' {...rest} style={{ minWidth: 60, borderRadius: 5, backgroundColor: primary ? colors.notification : colors.cardBackground }}>
+        <Text style={{ textAlign: 'center' }} variant='button' color={colors.text} >{title}</Text>
       </Box>
     </TouchableOpacity>
   )
@@ -88,6 +104,9 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
   }, [show,]);
 
   const saveStatus = () => {
+    if (select === NOWATCH) {
+      return;
+    }
     try {
       writeWatchStatus(mid, select, tags, comment);
       Alert.alert('保存成功', '');
@@ -135,7 +154,7 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
           {show && select === WATCHED &&
             <Box>
               <InputTags
-                textInputProps={{placeholder: '自定义标签(空格添加)'}}
+                textInputProps={{ placeholder: '自定义标签(空格添加)' }}
                 initialText=''
                 initialTags={tags}
                 onChangeTags={tags => setTags(tags)}
@@ -168,7 +187,7 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
                 />
               </Box>
             }
-            <CommonButton title='保存' onPressMethod={() => saveStatus()} />
+            {select != NOWATCH && <CommonButton title='保存' onPressMethod={() => saveStatus()} />}
           </Box>
         </Box>
       </TouchableWithoutFeedback>
@@ -179,23 +198,6 @@ const WatchPopup = ({ mid, status, userTags, setWatchShow, updateStatusMethod, s
 const VendorPopup = ({ vendors, show, setVendorShow }) => {
   const { colors } = useTheme();
 
-  const tryToOpenUri = (uri, url) => {
-    console.log('try opening: ', uri)
-    Linking.canOpenURL(uri).then((supported) => {
-      if (supported) {
-        Linking.openURL(uri)
-      } else
-        Alert.alert('App未安装', '是否从浏览器打开？', [{
-          text: '好',
-          onPress: () => Linking.openURL(url),
-          style: 'default',
-        }, {
-          text: '不了',
-          style: 'cancel',
-        },
-        ]);
-    });
-  }
   return (
     <Modal
       isVisible={show}
@@ -214,7 +216,7 @@ const VendorPopup = ({ vendors, show, setVendorShow }) => {
                     {vendor.title}{vendor.payments?.length > 0 && <Text variant='desc2'>（{vendor.payments[0].method}）</Text>}
                   </Text>
                 </Box>
-                {vendor.episodes_info !== '' && <Text variant='subtitle2'>{vendor.episodes_info}</Text>}
+                {/* {vendor.episodes_info !== '' && <Text variant='subtitle2'>{vendor.episodes_info}</Text>} */}
 
                 <Icon alignSelf='baseline' size={14} color={colors.text} name='chevron-forward-outline' />
               </Box>
@@ -226,6 +228,43 @@ const VendorPopup = ({ vendors, show, setVendorShow }) => {
 
   )
 
+}
+
+const VideoPopup = ({ videos, show, setVideoShow, server, player, ...rest }) => {
+  const genPlayLink = (videoLink) => {
+    const encodeVideoLink = encodeURIComponent(server + videoLink)
+    switch (player) {
+      case 'nplayer':
+        return `nplayer-${server}${videoLink}`;
+      case 'vlc':
+        return `vlc-x-callback://x-callback-url/stream?url=${encodeVideoLink}`;
+      // case 'mxplayer':
+      //   return 
+    }
+  }
+
+  return (
+    <Modal
+      {...rest}
+      isVisible={show}
+      onBackdropPress={() => setVideoShow(false)}
+      backdropOpacity={0.8}
+    >
+      <Box >
+        <ScrollView>
+          <TouchableOpacity onPress={() => setVideoShow(false)}>
+            <Box marginVertical='m' marginHorizontal='s' flexDirection='row' flexWrap='wrap'>
+
+              {
+                videos?.map((video, index) => <CommonButton margin='s' key={index} title={index + 1} onPressMethod={() => { tryToOpenUri(genPlayLink(video), server + video); }} />)
+              }
+            </Box>
+          </TouchableOpacity>
+        </ScrollView>
+      </Box>
+    </Modal>
+
+  )
 }
 
 const TitleBox = ({ title, year, subtitle, ...rest }) => {
@@ -441,7 +480,8 @@ const Recomendations = ({ mid, navigation, ...rest }) => {
           id: current.id,
           image: current.pic?.normal,
           title: current.title,
-          rate: current.rating ? current.rating.value : 0,
+          // rate: current.rating ? current.rating.value : 0,
+          rate: -2,
           onPressMethod: () =>
             navigation.push('MovieDetail', {
               mid: current.id
@@ -470,14 +510,22 @@ const Recomendations = ({ mid, navigation, ...rest }) => {
 
 export default ({ route, navigation }) => {
   const { colors } = useTheme();
-  const [headerOpacity, setHeaderOpacity] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [vendorShow, setVendorShow] = useState(false);
-  const [watchShow, setWatchShow] = useState(false);
 
+  const [headerOpacity, setHeaderOpacity] = useState(0);
+
+  const [loading, setLoading] = useState(true);
   const { mid } = route.params;
   const [movie, setMovie] = useState(new Object);
+  const [vendorShow, setVendorShow] = useState(false);
+
+  const [watchShow, setWatchShow] = useState(false);
   const [watchStatus, setWatchStatus] = useState(null);
+
+  const [videoShow, setVideoShow] = useState(false);
+  const [playOn, setPlayOn] = useState(false);
+  const [player, setPlayer] = useState(null);
+  const [serverUrl, setServerUrl] = useState(null);
+  const [videos, setVideos] = useState([]);
 
 
   // 设置标题栏title、透明度
@@ -507,12 +555,14 @@ export default ({ route, navigation }) => {
     });
   }, [headerOpacity,]);
 
+  // 初始化
   useEffect(() => {
     if (!mid) {
       return;
     }
     getMovie();
     getWatchStatus();
+    tryToGetServerVideos();
   }, []);
 
   const formatRoleData = (roles, type) => {
@@ -594,6 +644,32 @@ export default ({ route, navigation }) => {
     setWatchStatus(statusInStorage);
   }
 
+  const tryToGetServerVideos = async () => {
+    const setting = await getSetting('serversetting');
+    if (setting.serverUrl && setting.token) {
+      const data = await api.get(getUserInfo, {}, 'server', setting.serverUrl, setting.token);
+      if (data && data.id) {
+        console.log(data)
+        setPlayer(setting.player);
+        setServerUrl(setting.serverUrl);
+        const videosData = await api.get(getVideos(mid), {}, 'server', setting.serverUrl, setting.token);
+        if (videosData && videosData instanceof Array) {
+          setVideos(videosData);
+          setPlayOn(true);
+        }
+      }
+    }
+  }
+
+  const onScrollEnd = (event) => {
+    const offSetY = event.nativeEvent.contentOffset.y; // 获取滑动的距离
+    const contentSizeHeight = event.nativeEvent.contentSize.height; // scrollView  contentSize 高度
+    const oriageScrollHeight = event.nativeEvent.layoutMeasurement.height; // scrollView高度
+    if (offSetY + oriageScrollHeight >= contentSizeHeight - 1) {
+      navigation.navigate('WebView', { uri: movie.douban_link, title: '豆瓣' })
+    }
+  };
+
   return (
     <Box>
       <ScrollView
@@ -601,11 +677,14 @@ export default ({ route, navigation }) => {
           <RefreshControl
             refreshing={loading}
             onRefresh={() => { getMovie(refresh = true); }}
-          />}
+            progressViewOffset={25}
+          />
+        }
         onScroll={(event) => {
           const scrollY = event.nativeEvent.contentOffset.y;
           setHeaderOpacity(((scrollY - 0) * (1 - 0)) / (100 - 0) + 0);
         }}
+        onScrollEndDrag={onScrollEnd}
         scrollEventThrottle={10}
       >
         {/* {loading && <Box margin='xl'><Loading /></Box>} */}
@@ -617,17 +696,19 @@ export default ({ route, navigation }) => {
             <RatingInfo marginVertical='ss' mid={movie.id} />
             <Tags marginVertical='ss' tags={movie.tags} />
             <Directors marginVertical='ss' directors={movie.directors} />
-            <ButtonBox marg33inVertical='ss' navigation={navigation} mid={movie.id} vendors={movie.vendors} trailer={movie.trailer} douban_link={movie.douban_link} imdb_link={movie.imdb_link} setVendorShow={setVendorShow} watchStatus={watchStatus} setWatchShow={setWatchShow} />
+            <ButtonBox marginVertical='ss' navigation={navigation} mid={movie.id} vendors={movie.vendors} trailer={movie.trailer} douban_link={movie.douban_link} imdb_link={movie.imdb_link} setVendorShow={setVendorShow} watchStatus={watchStatus} setWatchShow={setWatchShow} />
+            <PlayListButton marginVertical='ss' show={playOn} onPressMethod={() => setVideoShow(true)} />
             <Intro marginVertical='s' text={movie.intro} />
             <Roles marginVertical='ss' actors={movie.actors} directors={movie.directors} />
             <Photos marginVertical='ss' mid={movie.id} />
             <Recomendations marginVertical='s' navigation={navigation} mid={movie.id} />
+            <Box><Text style={{ textAlign: 'center' }}>上拉查看评论</Text></Box>
           </Box>
         </FadeView>
       </ScrollView >
-      <VendorPopup show={vendorShow} vendors={movie.vendors} setVendorShow={setVendorShow} />
+      <VendorPopup vendors={movie.vendors} show={vendorShow} setVendorShow={setVendorShow} />
       <WatchPopup status={watchStatus} show={watchShow} mid={movie.id} userTags={movie.user_tags} setWatchShow={setWatchShow} updateStatusMethod={getWatchStatus} />
-
+      <VideoPopup videos={videos} show={videoShow} setVideoShow={setVideoShow} server={serverUrl} player={player} />
     </Box>
   )
 };

@@ -1,8 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Appearance } from 'react-native'
 import { WebView } from 'react-native-webview';
+import { Loading } from '../../theme/base'
+import { sleep } from "../../utils";
+import { useTheme } from '@react-navigation/native';
 
+const colorTheme = Appearance.getColorScheme();
 
 const JS_DOUBAN_SUBJECT = `
+  addNewStyle('html{background-color: #ebebeb !important;}');
   addNewStyle('.sub-trademark {display:none !important;}');
   addNewStyle('#TalionNav {display:none !important;}');
   addNewStyle('#celebrities {display:none !important;}');
@@ -17,11 +23,13 @@ const JS_DOUBAN_SUBJECT = `
   addNewStyle('.download-app {display:none !important;}');
   addNewStyle('.sub-vendor {display:none !important;}');
   addNewStyle('.card { margin-top: 10px; }');
-  addNewStyle('.cover-count { display:none !important;}');
-
+  ${colorTheme === 'dark' ? `addNewStyle('html { filter: invert(100%) hue-rotate(180deg); }');
+  addNewStyle('img  { filter: invert(100%) hue-rotate(180deg) contrast(100%); }');`
+    : ``}
   `;
 
 const JS_DOUBAN_REVIEW = `
+  addNewStyle('html{background-color: #ebebeb !important;}');
   addNewStyle('#TalionNav {display:none !important;}');
   addNewStyle('.subject-card {display:none !important;}');
   addNewStyle('.tags {display:none !important;}');
@@ -32,6 +40,9 @@ const JS_DOUBAN_REVIEW = `
   addNewStyle('.oia-readall {display:none !important;}');
   addNewStyle('.hidden-content {display:none !important;}');
   addNewStyle('.read-all {display:none !important;}');
+  ${colorTheme === 'dark' ? `addNewStyle('html { filter: invert(100%) hue-rotate(180deg); }');
+  addNewStyle('img  { filter: invert(100%) hue-rotate(180deg) contrast(100%); }');`
+    : ``}
   addNewStyle('.note-content {max-height: none !important; overflow: auto !important;}');
   let adTextEles = document.querySelectorAll("div[style~='center']");
   for (const ele of adTextEles){ele.style.display='none'}
@@ -74,6 +85,9 @@ const INJECTED_JS = `
 
 export default ({ route, navigation }) => {
   const { uri, title } = route.params;
+  const { colors, } = useTheme();
+  const [loading, setLoading] = useState(true);
+
   console.log(uri)
   const displayTabBar = () => {
     const parent = navigation.getParent();
@@ -93,6 +107,19 @@ export default ({ route, navigation }) => {
   }, [navigation]);
   return (
     <WebView
+      style={{ flex: loading ? 0 : 1, backgroundColor: colors.cardBackground }}
+      startInLoadingState={true}
+      renderLoading={
+        () => {
+          return (<Loading />)
+        }
+      }
+      onLoadEnd={(syntheticEvent) => {
+        // update component to be aware of loading status
+        const { nativeEvent } = syntheticEvent;
+        sleep(500);
+        setLoading(false);
+      }}
       source={{ uri: uri }}
       injectedJavaScript={INJECTED_JS}
       onShouldStartLoadWithRequest={(request) => {

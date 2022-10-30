@@ -60,6 +60,9 @@
 		<string>bilibili</string>
 		<string>imgotv</string>
 		<string>cntvcbox</string>
+		<string>nplayer-https</string>
+		<string>nplayer-http</string>
+		<string>vlc-x-callback</string>
 	</array>
 </dict>
 </plist>

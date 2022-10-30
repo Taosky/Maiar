@@ -47,10 +47,20 @@ export default ({ route, navigation }) => {
       }, 300);
     }
     for (const result of results) {
-      result.onPressMethod = () => navigation.navigate('MovieDetail', {
-        mid: result.id
-      });
-      currentMovies.push(result);
+      const formatedMovie = {
+        poster: result.poster,
+        title: result.title,
+        subtitle: result.card_subtitle,
+        rating: result.rating,
+        isTv: result.is_tv,
+        description: null,
+        onPressMethod: () => {
+          navigation.navigate('MovieDetail', {
+            mid: result.id
+          })
+        }
+      }
+      currentMovies.push(formatedMovie);
     }
 
     setMovies(currentMovies);
@@ -73,7 +83,7 @@ export default ({ route, navigation }) => {
       >
         <Box padding='s'>
           {movies?.map((movie) =>
-            <MovieCard marginVertical='s' key={movie.id} item={movie} />
+            <MovieCard marginVertical='s' key={movie.id} {...movie} />
           )}
         </Box>
         {loading && <Loading />}

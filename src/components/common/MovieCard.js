@@ -28,34 +28,34 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   detail: {
-    width: 260 * WLR,
+    width: 276 * WLR,
   }
 });
 
-export default ({ item, ...rest }) => {
+export default ({ poster, title, subtitle, rating, isTv, description, onPressMethod, ...rest }) => {
   const { colors } = useTheme();
   return (
-    <TouchableOpacity onPress={() => item.onPressMethod()}>
+    <TouchableOpacity onPress={() => onPressMethod()}>
       <Box {...rest} >
-        <Box style={{ height: cardHeight, borderRadius: 6, borderBottomLeftRadius: item.description ? 0 : 6, borderBottomRightRadius: item.description ? 0 : 6, backgroundColor: colors.cardBackground }} flexDirection='row'>
-          <FastImage style={styles.poster} source={{ uri: item.poster ? item.poster : item.cover_url }}></FastImage>
+        <Box style={{ height: cardHeight, borderRadius: 6, borderBottomLeftRadius: description ? 0 : 6, borderBottomRightRadius: description ? 0 : 6, backgroundColor: colors.cardBackground }} flexDirection='row'>
+          <FastImage style={styles.poster} source={{ uri: poster }}></FastImage>
           <Box style={styles.detail} padding='s'>
             <Box flexDirection='row' flexWrap='wrap'>
-              <Text numberOfLines={1} ellipsizeMode='tail' variant='title3'>{item.title}</Text>
+              <Text numberOfLines={1} ellipsizeMode='tail' variant='title3'>{title}</Text>
             </Box>
             <Box marginVertical='ss' flexDirection='row' flexWrap='wrap'>
-              <Rate rating={item.rating?.value} />
-              <Box marginLeft='ss'><Text>{item.rating?.value !== 0 ? item.rating?.value.toFixed(1) : '无评分'}</Text></Box>
+              <Rate rating={rating?.value} />
+              <Box marginLeft='ss'><Text>{rating?.value !== 0 ? rating?.value.toFixed(1) : '无评分'}</Text></Box>
             </Box>
             <Text numberOfLines={2} ellipsizeMode='tail' style={{ verticalAlign: 'top' }} >
-              {(item.is_tv === true || item.is_tv === false) && <Tag color={item.is_tv ? 'blue' : 'orange'} text={item.is_tv ? '剧集' : '电影'} />}
-              <Text variant='desc3'>  {item.card_subtitle}</Text>
+              {(isTv === true || isTv === false) && <Tag color={isTv ? 'blue' : 'orange'} text={isTv ? '剧集' : '电影'} />}
+              <Text variant='desc3'>  {subtitle}</Text>
             </Text>
           </Box>
         </Box>
-        {item.description &&
+        {description &&
           <Box padding='s' style={{ backgroundColor: colors.subcard, borderRadius: 6, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
-            <Text variant='desc3'>{item.description}</Text>
+            <Text variant='desc3'>{description}</Text>
           </Box>
         }
       </Box>

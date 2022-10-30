@@ -14,6 +14,7 @@ import SearchResultScreen from './screens/search/result'
 import WebViewScreen from './screens/webview/index'
 import CelebrityDetailScreen from './screens/celebrity/detail'
 import RankDetailScreen from './screens/explore/rankDetail'
+import SettingScreen from './screens/me/setting'
 
 Icon.loadFont()
 const colorTheme = Appearance.getColorScheme();
@@ -111,6 +112,11 @@ const App = () => {
           component={RankDetailScreen} />
         <NoTabStack.Screen name="WebView"
           component={WebViewScreen} />
+        <NoTabStack.Screen name="Setting"
+        options={{
+          title: '设置'
+        }}
+          component={SettingScreen} />
       </NoTabStack.Navigator>
 
     )

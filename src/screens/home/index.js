@@ -81,7 +81,7 @@ export default ({ route, navigation }) => {
 
         {recentHots?.length === 0 && <Box margin='xl'><Loading /></Box>}
 
-        <Box marginVertical='s' marginLeft='m'>
+        <Box marginVertical='s' marginLeft='s'>
           {
             recentHots?.map((hotList) =>
               <PosterScrollList marginVertical='s' key={hotList.title} title={hotList.title} posterItems={hotList.moviePosters?.map((movie) =>

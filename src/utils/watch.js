@@ -7,10 +7,9 @@ const NOWATCH = -1;
 
 
 const genStatistics = async () => {
-  // 半小时内不更新
   try {
     const lastStatistics = await storage.load({ key: 'statistics' });
-    if (Date.parse(new Date()) - lastStatistics.updatedAt < 1800000) {
+    if (Date.parse(new Date()) - lastStatistics.updatedAt < 5000) {
       console.log('skip statistic generation...')
       return
     }
@@ -84,6 +83,7 @@ const genStatistics = async () => {
 }
 
 const readStatistics = async () => {
+  console.log('reading statistics...')
   let lastStatistics = null;
   try {
     lastStatistics = await storage.load({ key: 'statistics' });

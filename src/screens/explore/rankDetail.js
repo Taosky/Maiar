@@ -5,7 +5,7 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { storage, sleep } from '../../utils';
 import { Box, Text, Loading } from '../../theme/base'
 import Icon from 'react-native-vector-icons/Ionicons';
-import MovieCard from '../../components/common/MovieCard'
+import MovieCardList from '../../components/common/MovieCardList'
 
 
 export default ({ route, navigation }) => {
@@ -55,10 +55,17 @@ export default ({ route, navigation }) => {
 
     let newMovies = [];
     for (let movie of data.subject_collection_items) {
-      movie.onPressMethod = () => navigation.push('MovieDetail', {
-        mid: movie.id,
-      })
-      newMovies.push(movie);
+      newMovies.push({
+        poster: movie.poster ? movie.poster : movie.cover_url,
+        title: movie.title,
+        subtitle: movie.card_subtitle,
+        rating: movie.rating,
+        isTv: movie.is_tv,
+        description: movie.description,
+        onPressMethod: () => navigation.push('MovieDetail', {
+          mid: movie.id,
+        }),
+      });
     }
     const currentMovies = movies;
     const newAllMovies = currentMovies.concat(newMovies);
@@ -88,7 +95,7 @@ export default ({ route, navigation }) => {
         }}
         scrollEventThrottle={400}
       >
-        <Box padding='m'>
+        <Box padding='s'>
           {
             rankInfo && <Box flexDirection='row'>
               <Text variant='title3'>
@@ -96,16 +103,7 @@ export default ({ route, navigation }) => {
               </Text>
             </Box>
           }
-          <Box>
-            {
-              movies.map((movie, index) => (
-                <Box key={movie.id} marginTop='ss'>
-                  <Text variant='rankNo'>No. {index + 1}</Text>
-                  <MovieCard item={movie} />
-                </Box>
-              ))
-            }
-          </Box>
+          <MovieCardList items={movies} rank={true} />
           {loading && <Loading />}
           <Box margin='m'>
             <Text variant='tip'>{noMore && '(´・ω・｀) 没有更多了'}</Text>

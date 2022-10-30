@@ -37,7 +37,7 @@ export default ({ route, navigation }) => {
 
   return (
     <ScrollView>
-      <Box paddingHorizontal='m'>
+      <Box paddingHorizontal='s'>
         <Box flexDirection='row' flexWrap='wrap' justifyContent='space-around'  >
           {
             rankList.map((rank, index) => (

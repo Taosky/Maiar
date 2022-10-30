@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react'
-import { ScrollView, Image, SafeAreaView } from "react-native";
+import { ScrollView, Image, SafeAreaView, TouchableOpacity, RefreshControl } from "react-native";
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CalendarHeatmap from 'react-native-calendar-heatmap-count';
@@ -8,6 +8,13 @@ import { readWatchedValuesInCalendar, getDateStrHyphen, readStatistics } from '.
 
 import { Box, Text } from '../../theme/base'
 import { WLR } from '../../utils'
+
+function useForceUpdate() {
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update state to force render
+  // An function that increment 👆🏻 the previous state like here 
+  // is better than directly setting `value + 1`
+}
 
 const BackgroundBox = ({ ...rest }) => {
   const { colors } = useTheme();
@@ -25,25 +32,27 @@ const Tag = ({ isTv, text, ...rest }) => {
   )
 }
 
-const UserBasic = (navigation) => {
+const UserBasic = ({ navigation }) => {
   return (
     <Box>
-      <Box flexDirection='row' alignItems='center'>
-        <Image style={{ width: 70 * WLR, height: 70 * WLR, borderRadius: 70 * WLR / 2 }} source={{ uri: 'https://pic2.zhimg.com/v2-0e1ebe66bc6f4a695c2b05ac114bf35d_b.jpg' }} />
-        <Box style={{ width: 250 * WLR }} marginLeft='s'>
-          <Text ellipsizeMode='tail' numberOfLines={1} variant='title2'>喜马拉雅小熊猫</Text>
-          <Text style={{ marginTop: 6 * WLR }} ellipsizeMode='tail' numberOfLines={2} variant='desc2'> 电影发明以后，人类的生命，比起以前延长了至少三倍...</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('NoTabScreen', { screen: 'Setting' })}>
+        <Box flexDirection='row' alignItems='center'>
+          <Image style={{ width: 70 * WLR, height: 70 * WLR, borderRadius: 70 * WLR / 2 }} source={{ uri: 'https://pic2.zhimg.com/v2-0e1ebe66bc6f4a695c2b05ac114bf35d_b.jpg' }} />
+          <Box style={{ width: 250 * WLR }} marginLeft='s'>
+            <Text ellipsizeMode='tail' numberOfLines={1} variant='title2'>喜马拉雅小熊猫</Text>
+            <Text style={{ marginTop: 6 * WLR }} ellipsizeMode='tail' numberOfLines={2} variant='desc2'> 电影发明以后，人类的生命，比起以前延长了至少三倍...</Text>
+          </Box>
+          <Text>
+            <Icon name='chevron-forward-outline' size={26 * WLR} />
+          </Text>
         </Box>
-        <Text>
-          <Icon name='chevron-forward-outline' size={26 * WLR} />
-        </Text>
-      </Box>
+      </TouchableOpacity>
     </Box>
 
   )
 }
 
-const WatchCount = ({ ...rest }) => {
+const WatchCount = ({ route,loading, ...rest }) => {
   const { colors } = useTheme();
   const [valendarValues, setValues] = useState([]);
   const [monthCount, setMonthCount] = useState(0);
@@ -63,7 +72,7 @@ const WatchCount = ({ ...rest }) => {
   }
   useEffect(() => {
     getData();
-  }, []);
+  }, [loading,]);
   return (
     <Box {...rest}>
       <Text variant='title0'>观影趋势</Text>
@@ -78,10 +87,14 @@ const WatchCount = ({ ...rest }) => {
         </BackgroundBox>
         <BackgroundBox>
           <CalendarHeatmap
-            showMonthLabels={false}
+            gutterSize={2}
+            showOutOfRangeDays={true}
+            showMonthLabels={true}
+            monthLabelForIndex={(index) => ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'][index]}
+            monthLabelsColor={colors.text}
             colorArray={[colors.subcard, "#d6e685", "#8cc665", "#44a340", "#1e6823"]}
             endDate={new Date()}
-            numDays={66}
+            numDays={64}
             values={valendarValues}
           />
         </BackgroundBox>
@@ -91,7 +104,7 @@ const WatchCount = ({ ...rest }) => {
   )
 }
 
-const WatchAnalyze = ({ statistics, ...rest }) => {
+const WatchAnalyze = ({ statistics, route, ...rest }) => {
   const { colors } = useTheme();
 
 
@@ -101,7 +114,6 @@ const WatchAnalyze = ({ statistics, ...rest }) => {
       <Box marginTop='s'>
         <BackgroundBox>
           <Box margin='s' flexDirection='row' alignItems='flex-end'>
-            {/* width 337 */}
             <Box flexDirection='row' justifyContent='space-between' style={{ width: 100 * WLR }}>
               <Text style={{ color: colors.movieText }}><Icon name='film-outline' size={20} /></Text>
               <Text variant='title1' style={{ color: colors.movieText }}><Text variant='box' style={{ color: colors.movieText }}>{statistics ? statistics.watched.total : 0}</Text> 看过</Text>
@@ -133,15 +145,16 @@ const WatchAnalyze = ({ statistics, ...rest }) => {
   )
 }
 
-export default (navigation) => {
-
-  const [loading, setLoading] = useState(true);
-  // const { colors } = useTheme();
+export default ({ route, navigation }) => {
   const [statistics, setStatistics] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const forceUpdate = useForceUpdate();
 
   const getData = async () => {
+    setLoading(true);
     const lastStatistics = await readStatistics();
     setStatistics(lastStatistics);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -150,10 +163,12 @@ export default (navigation) => {
 
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => { getData(); }} progressViewOffset={25} />}
+      >
         <Box padding='s'>
-          <UserBasic />
-          <WatchCount marginVertical='s' />
+          <UserBasic navigation={navigation} />
+          <WatchCount loading={loading} marginVertical='s' />
           <WatchAnalyze marginVertical='s' statistics={statistics} />
         </Box>
       </ScrollView>
