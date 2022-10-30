@@ -95,14 +95,12 @@ const ServerSetting = ({ }) => {
   const authAndSave = async () => {
     const data = await api.post(getServerToken, { username: username, password: password }, 'server', serverUrl);
     if (data && data.access_token) {
-      if (!selectedPlayer) {
-        await writeSetting('serversetting', { serverUrl: serverUrl, token: data.access_token, player: selectedPlayer ? selectedPlayer : playerList[0].value });
-        Alert.alert('授权完成');
-        getSettingData();
-        setAuthorizeShow(false);
-      } else {
-        Alert.alert('请求出错', '检查网络及验证信息');
-      }
+      await writeSetting('serversetting', { serverUrl: serverUrl, token: data.access_token, player: selectedPlayer ? selectedPlayer : playerList[0].value });
+      Alert.alert('授权完成');
+      getSettingData();
+      setAuthorizeShow(false);
+    } else {
+      Alert.alert('请求出错', '检查网络及验证信息');
     }
   }
 
