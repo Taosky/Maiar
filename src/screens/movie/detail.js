@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { ScrollView, RefreshControl, TouchableOpacity, TouchableWithoutFeedback, Keyboard, StyleSheet, Image, Alert, TextInput } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
@@ -13,9 +13,10 @@ import Backdrop from '../../components/common/Backdrop';
 import { MoviePoster, RolePoster, PhotoPoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
 import { readWatchStatus, writeWatchStatus, tryToOpenUri } from '../../utils';
-import { getSetting, } from '../../utils';
 import * as api from '../../api/APIUtils'
 import { getVideos, getUserInfo } from '../../api/ServerAPI'
+import { SettingContext } from '../../App'
+
 
 const PlayListButton = ({ show, onPressMethod, ...rest }) => {
 
@@ -511,6 +512,8 @@ const Recomendations = ({ mid, navigation, ...rest }) => {
 export default ({ route, navigation }) => {
   const { colors } = useTheme();
 
+  const setting = useContext(SettingContext);
+
   const [headerOpacity, setHeaderOpacity] = useState(0);
 
   const [loading, setLoading] = useState(true);
@@ -645,14 +648,14 @@ export default ({ route, navigation }) => {
   }
 
   const tryToGetServerVideos = async () => {
-    const setting = await getSetting('serversetting');
-    if (setting.serverUrl && setting.token) {
-      const data = await api.get(getUserInfo, {}, 'server', setting.serverUrl, setting.token);
+    const serverSetting = setting.server;
+    if (serverSetting && serverSetting.serverUrl && serverSetting.token) {
+      const data = await api.get(getUserInfo, {}, 'server', serverSetting.serverUrl, serverSetting.token);
       if (data && data.id) {
         console.log(data)
-        setPlayer(setting.player);
-        setServerUrl(setting.serverUrl);
-        const videosData = await api.get(getVideos(mid), {}, 'server', setting.serverUrl, setting.token);
+        setPlayer(serverSetting.player);
+        setServerUrl(serverSetting.serverUrl);
+        const videosData = await api.get(getVideos(mid), {}, 'server', serverSetting.serverUrl, serverSetting.token);
         if (videosData && videosData instanceof Array) {
           setVideos(videosData);
           setPlayOn(true);

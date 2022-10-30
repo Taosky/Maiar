@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Appearance } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { theme, darkTheme } from './theme/custom';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import HomeScreen from './screens/home'
 import ExploreScreen from './screens/explore'
 import MeScreen from './screens/me'
@@ -15,9 +14,14 @@ import WebViewScreen from './screens/webview/index'
 import CelebrityDetailScreen from './screens/celebrity/detail'
 import RankDetailScreen from './screens/explore/rankDetail'
 import SettingScreen from './screens/me/setting'
+import { getSetting, } from './utils';
+
+
 
 Icon.loadFont()
 const colorTheme = Appearance.getColorScheme();
+const SettingContext = React.createContext({});
+
 
 const App = () => {
   const [darkMode, setDarkMode] = useState(colorTheme === 'dark' ? true : false);
@@ -38,8 +42,24 @@ const App = () => {
     }
 
   });
+
+  const [setting, setSetting] = useState({});
+
+  const updateSetting = async () => {
+    let curSetting = setting;
+    const serverSetting = await getSetting('serversetting');
+    curSetting['server'] = serverSetting;
+    setSetting(curSetting);
+  }
+
   const TabStack = createBottomTabNavigator();
   const Tabs = () => {
+    const navigation = useNavigation();
+    useEffect(() => {
+      navigation?.addListener('focus', () => {
+        updateSetting();
+      });
+    }, []);
     return (
       <TabStack.Navigator
         screenOptions={({ route }) => ({
@@ -113,9 +133,9 @@ const App = () => {
         <NoTabStack.Screen name="WebView"
           component={WebViewScreen} />
         <NoTabStack.Screen name="Setting"
-        options={{
-          title: '设置'
-        }}
+          options={{
+            title: '设置'
+          }}
           component={SettingScreen} />
       </NoTabStack.Navigator>
 
@@ -125,21 +145,26 @@ const App = () => {
   const MainStack = createNativeStackNavigator();
 
   return (
-    <NavigationContainer
-      theme={darkMode ? darkTheme : theme}>
-      <MainStack.Navigator>
-        <MainStack.Screen options={{
-          headerShown: false,
-        }} name="TabScreen" component={Tabs} />
-        <MainStack.Screen options={{
-          headerShown: false,
-          headerTransparent: true,
-          headerBackTitle: '',
-          title: ''
-        }} name="NoTabScreen" component={NoTabs} />
-      </MainStack.Navigator>
-    </NavigationContainer>
+    <SettingContext.Provider value={setting}>
+      <NavigationContainer
+        theme={darkMode ? darkTheme : theme}>
+        <MainStack.Navigator>
+          <MainStack.Screen options={{
+            headerShown: false,
+          }} name="TabScreen" component={Tabs} />
+          <MainStack.Screen options={{
+            headerShown: false,
+            headerTransparent: true,
+            headerBackTitle: '',
+            title: ''
+          }} name="NoTabScreen" component={NoTabs} />
+        </MainStack.Navigator>
+      </NavigationContainer>
+    </SettingContext.Provider>
   );
 };
 
 export default App;
+export {
+  SettingContext,
+}

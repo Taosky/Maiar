@@ -5,6 +5,7 @@ import { Box, Text } from '../../theme/base'
 import Rate from './StarRating'
 import { WLR } from '../../utils/index'
 import { useTheme } from '@react-navigation/native';
+import PlayableTag from './PlayableTag';
 
 const Tag = ({ color, text }) => {
   const colors = {
@@ -32,13 +33,15 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ({ poster, title, subtitle, rating, isTv, description, onPressMethod, ...rest }) => {
+export default ({ id, poster, title, subtitle, rating, isTv, description, playable, onPressMethod, ...rest }) => {
   const { colors } = useTheme();
   return (
     <TouchableOpacity onPress={() => onPressMethod()}>
       <Box {...rest} >
         <Box style={{ height: cardHeight, borderRadius: 6, borderBottomLeftRadius: description ? 0 : 6, borderBottomRightRadius: description ? 0 : 6, backgroundColor: colors.cardBackground }} flexDirection='row'>
-          <FastImage style={styles.poster} source={{ uri: poster }}></FastImage>
+          <FastImage style={styles.poster} source={{ uri: poster }}>
+            <PlayableTag mid={id}/>
+          </FastImage>
           <Box style={styles.detail} padding='s'>
             <Box flexDirection='row' flexWrap='wrap'>
               <Text numberOfLines={1} ellipsizeMode='tail' variant='title3'>{title}</Text>

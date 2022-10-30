@@ -4,6 +4,7 @@ import FastImage from 'react-native-fast-image'
 import { Box, Text } from '../../theme/base'
 import Rate from './StarRating'
 import { WLR, } from '../../utils'
+import PlayableTag from './PlayableTag';
 
 const posterWidth = 90 * WLR;
 const photoHeight = 100 * WLR;
@@ -36,9 +37,11 @@ const MoviePoster = ({ movie, ...rest }) => {
     <Box {...rest}>
       <TouchableOpacity onPress={movie.onPressMethod}>
         <Box style={styles.poster}>
-          <FastImage style={styles.image} source={{ uri: movie.image }}></FastImage>
+          <FastImage style={styles.image} source={{ uri: movie.image }}>
+            <PlayableTag mid={movie.id} />
+          </FastImage>
           <Text variant='subtitle3' style={styles.title} ellipsizeMode='tail' numberOfLines={1} >{movie.title}</Text>
-          {movie.rate !=-2 && <Rate style={styles.rate} rating={movie.rate}></Rate>}
+          {movie.rate != -2 && <Rate style={styles.rate} rating={movie.rate}></Rate>}
         </Box>
       </TouchableOpacity>
     </Box>

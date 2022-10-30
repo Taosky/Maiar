@@ -48,6 +48,7 @@ export default ({ route, navigation }) => {
     }
     for (const result of results) {
       const formatedMovie = {
+        id: result.id,
         poster: result.poster,
         title: result.title,
         subtitle: result.card_subtitle,

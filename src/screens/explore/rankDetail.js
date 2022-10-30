@@ -56,6 +56,7 @@ export default ({ route, navigation }) => {
     let newMovies = [];
     for (let movie of data.subject_collection_items) {
       newMovies.push({
+        id: movie.id,
         poster: movie.poster ? movie.poster : movie.cover_url,
         title: movie.title,
         subtitle: movie.card_subtitle,
