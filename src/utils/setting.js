@@ -2,7 +2,7 @@ import storage from "./storage";
 
 
 const getSetting = async (key,) => {
-  console.log('reading setting: ',key)
+  console.log('reading setting: ', key)
   let setting = null;
   try {
     setting = await storage.load({ key: key });
@@ -15,12 +15,12 @@ const getSetting = async (key,) => {
 }
 
 const writeSetting = async (key, data) => {
-  console.log('writing setting: ',key)
+  console.log('writing setting: ', key)
   await storage.save({ key: key, data: data });
 }
 
 
 export {
-  getSetting, 
+  getSetting,
   writeSetting,
 }

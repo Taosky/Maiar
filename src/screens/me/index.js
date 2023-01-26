@@ -52,7 +52,7 @@ const UserBasic = ({ navigation }) => {
   )
 }
 
-const WatchCount = ({ route,loading, ...rest }) => {
+const WatchCount = ({ route, loading, ...rest }) => {
   const { colors } = useTheme();
   const [valendarValues, setValues] = useState([]);
   const [monthCount, setMonthCount] = useState(0);

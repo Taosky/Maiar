@@ -88,7 +88,6 @@ export default ({ route, navigation }) => {
   const { colors, } = useTheme();
   const [loading, setLoading] = useState(true);
 
-  console.log(uri)
   const displayTabBar = () => {
     const parent = navigation.getParent();
     parent.setOptions({

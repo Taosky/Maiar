@@ -653,7 +653,6 @@ export default ({ route, navigation }) => {
     if (serverSetting && serverSetting.serverUrl && serverSetting.token) {
       const data = await api.get(getUserInfo, {}, 'server', serverSetting.serverUrl, serverSetting.token);
       if (data && data.id) {
-        console.log(data)
         setPlayer(serverSetting.player);
         setServerUrl(serverSetting.serverUrl);
         const videosData = await api.get(getVideos(mid), {}, 'server', serverSetting.serverUrl, serverSetting.token);

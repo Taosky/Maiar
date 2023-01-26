@@ -40,18 +40,18 @@ const getMoviePhotosById = (id) => {
 const getMoviesByTitle = () => {
   return `/`
 }
-const getCelebrityById = (id)=>{
+const getCelebrityById = (id) => {
   return `/data/${id}.json`
 }
 
-const getRankMovies = (_type, page=1, limit=20)=>{
-  console.log('page: ',page, 'limit: ', limit);
-  if (_type==='movie_top250'){
+const getRankMovies = (_type, page = 1, limit = 20) => {
+  console.log('page: ', page, 'limit: ', limit);
+  if (_type === 'movie_top250') {
     return `/top250/${page}.json`
-  } else if (_type==='movie_weekly_best' || _type==='tv_chinese_weekly_best' || _type==='tv_global_weekly_best'){
-    return `/weekly_best/${_type.replace('_weekly_best','')}/${page}.json`
+  } else if (_type === 'movie_weekly_best' || _type === 'tv_chinese_weekly_best' || _type === 'tv_global_weekly_best') {
+    return `/weekly_best/${_type.replace('_weekly_best', '')}/${page}.json`
   }
-  return `/category/${_type.replace('movie_','')}/${page}.json`
+  return `/category/${_type.replace('movie_', '')}/${page}.json`
 }
 
 

@@ -58,7 +58,6 @@ const ServerSetting = ({ }) => {
   const checkToken = async (serverUrl, token) => {
     const data = await api.get(getUserInfo, {}, 'server', serverUrl, token);
     if (data && data.id) {
-      console.log(data)
       onChangeTokenExpired(false);
     }
   }

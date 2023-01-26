@@ -55,7 +55,7 @@ export default ({ route, navigation }) => {
     request_body["filter"]["title"]["$options"] = "i";
     request_body["sort"]["year"] = -1;
     request_body["sort"]["_id"] = -1;
-    const response = await api.post(getMoviesByTitle(), request_body, 'movieSearch',null, 'LLppSL7L7bjMm7uHavkXOICu9iymDvwn51rADdUM7hXDjEhxVGZ8zPRqnKOdnLu8');
+    const response = await api.post(getMoviesByTitle(), request_body, 'movieSearch', null, 'LLppSL7L7bjMm7uHavkXOICu9iymDvwn51rADdUM7hXDjEhxVGZ8zPRqnKOdnLu8');
     const results = response.documents;
     if (results.length < limit) {
       setTimeout(() => {
@@ -64,9 +64,9 @@ export default ({ route, navigation }) => {
     }
     for (const result of results) {
       let subtitle = result.year;
-      if (result.tags.length > 0){
-        for (const tag of result.tags.slice(0, 6)){
-          if (tag !== result.year){
+      if (result.tags.length > 0) {
+        for (const tag of result.tags.slice(0, 6)) {
+          if (tag !== result.year) {
             subtitle += ' / ' + tag;
           }
         }
@@ -76,7 +76,7 @@ export default ({ route, navigation }) => {
         poster: result.poster,
         title: result.title,
         subtitle: subtitle,
-        rating: {value: result.rating},
+        rating: { value: result.rating },
         isTv: result.is_tv,
         description: null,
         onPressMethod: () => {
