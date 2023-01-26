@@ -5,12 +5,12 @@ import Modal from 'react-native-modal';
 import { Box, Text } from '../../theme/base';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '@react-navigation/native';
-import ImageView from 'react-native-image-viewing';
 import InputTags from 'react-native-tags';
 import { storage, alert404, sleep } from '../../utils';
 import PosterScrollList from '../../components/common/PosterScrollList'
 import Backdrop from '../../components/common/Backdrop';
-import { MoviePoster, RolePoster, PhotoPoster } from '../../components/common/Poster';
+import { MoviePoster, RolePoster } from '../../components/common/Poster';
+import Photos from '../../components/common/MoviePhotos';
 import { FadeView } from '../../components/common/AnimatedView';
 import { readWatchStatus, writeWatchStatus, tryToOpenUri } from '../../utils';
 import * as api from '../../api/APIUtils'
@@ -395,77 +395,6 @@ const Roles = ({ directors, actors, ...rest }) => {
   )
 }
 
-const ImageFooter = ({ imageIndex, imagesCount }) => (
-  <Box style={{
-    height: 64,
-    backgroundColor: '#00000077',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }}>
-    <Text style={{
-      fontSize: 17,
-      color: '#FFF'
-    }}>{`${imageIndex + 1} / ${imagesCount}`}</Text>
-  </Box>
-)
-
-const Photos = ({ mid, ...rest }) => {
-  const [visible, setIsVisible] = useState(false);
-  const [photoIndex, setPhotoIndex] = useState(0);
-  const [smalls, setSmalls] = useState([]);
-  const [larges, setLarges] = useState([]);
-
-  useEffect(() => { getData(); }, [mid,])
-
-  const getData = async () => {
-    if (!mid) {
-      return
-    }
-    let data = await storage.load({ key: 'photos', id: mid });
-    if (data?.photos?.length > 0) {
-      let smallImages = [];
-      let largeImages = [];
-      let index = 0;
-      for (const photo of data.photos) {
-        if (photo.image?.is_animated === false && photo.image?.large && photo.image?.small) {
-          const photoIndex = index;
-          smallImages.push({
-            uri: photo.image.small.url,
-            onPressMethod: () => {
-              setPhotoIndex(photoIndex);
-              setIsVisible(true);
-            },
-          });
-          largeImages.push({ uri: photo.image.large.url });
-          index += 1;
-        }
-      }
-      setSmalls(smallImages);
-      setLarges(largeImages);
-    }
-  }
-  return (
-    <Box>
-      {smalls.length > 0 &&
-        <Box {...rest}>
-          <PosterScrollList title={'剧照'} posterItems={
-            smalls?.map((photo, index) => <PhotoPoster marginRight='s' key={index} photo={photo} />)
-          } />
-          <ImageView
-            images={larges}
-            imageIndex={photoIndex}
-            visible={visible}
-            onRequestClose={() => setIsVisible(false)}
-            FooterComponent={({ imageIndex }) => (
-              <ImageFooter imageIndex={imageIndex} imagesCount={larges.length} />
-            )}
-          />
-        </Box>
-      }
-    </Box>
-  )
-}
-
 const Recomendations = ({ mid, navigation, ...rest }) => {
   const [recommendations, setRecommendations] = useState([])
 
@@ -703,7 +632,7 @@ export default ({ route, navigation }) => {
             <PlayListButton marginVertical='ss' show={playOn} onPressMethod={() => setVideoShow(true)} />
             <Intro marginVertical='s' text={movie.intro} />
             <Roles marginVertical='ss' actors={movie.actors} directors={movie.directors} />
-            <Photos marginVertical='ss' mid={movie.id} />
+            <Photos marginVertical='ss' navigation={navigation} mid={movie.id} />
             <Recomendations marginVertical='s' navigation={navigation} mid={movie.id} />
             <Box><Text style={{ textAlign: 'center' }}>上拉查看评论</Text></Box>
           </Box>

@@ -5,7 +5,7 @@ import { storage } from '../../utils';
 import { Box, Text } from '../../theme/base';
 import { RolePoster, MoviePoster } from '../../components/common/Poster';
 import { FadeView } from '../../components/common/AnimatedView';
-import PosterWall from '../../components/common/PosterWall';
+import PosterWallList from '../../components/common/PosterWallList';
 
 export default ({ route, navigation }) => {
   const { cid } = route.params;
@@ -69,7 +69,7 @@ export default ({ route, navigation }) => {
                 {celebrity?.abstract}
               </Text>
             </Box>
-            <PosterWall marginVertical='s' title={'相关作品'} posterItems={
+            <PosterWallList marginVertical='s' title={'相关作品'} posterItems={
               celebrity?.movies?.map((movie, index) => <MoviePoster marginHorizontal='s' key={index} movie={movie} />)
             } />
           </Box>

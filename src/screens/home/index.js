@@ -12,7 +12,6 @@ export default ({ route, navigation }) => {
 
   const [recentHots, setRecentHots] = useState(new Array());
 
-
   useEffect(() => {
     getRcentHots();
   }, []);
@@ -40,22 +39,26 @@ export default ({ route, navigation }) => {
 
     let data = await storage.load({ key: 'hot', id: 'movieHotGaia' });
     curRecentHots.push({
+      id: 'movieHotGaia',
       title: '豆瓣热门',
       moviePosters: format(data)
     });
     data = await storage.load({ key: 'hot', id: 'movieShowing' });
     curRecentHots.push({
+      id: 'movieShowing',
       title: '正在上映',
       moviePosters: format(data)
     });
 
     data = await storage.load({ key: 'hot', id: 'tvHot' });
     curRecentHots.push({
+      id: 'tvHot',
       title: '热门剧集',
       moviePosters: format(data)
     });
     data = await storage.load({ key: 'hot', id: 'tvVarietyShow' });
     curRecentHots.push({
+      id: 'tvVarietyShow',
       title: '热门综艺',
       moviePosters: format(data)
     });
@@ -84,9 +87,14 @@ export default ({ route, navigation }) => {
         <Box marginVertical='s' marginLeft='s'>
           {
             recentHots?.map((hotList) =>
-              <PosterScrollList marginVertical='s' key={hotList.title} title={hotList.title} posterItems={hotList.moviePosters?.map((movie) =>
+              <PosterScrollList marginVertical='s' key={hotList.title} title={hotList.title} posterItems={hotList.moviePosters?.slice(0, 7).map((movie) =>
                 <MoviePoster marginRight='m' key={movie.id} movie={movie} />
-              )}></PosterScrollList>
+              )} showMore={true} onMorePressMethod={() => navigation.navigate('NoTabScreen', {
+                screen: 'HotMore',
+                params: {
+                  hid: hotList.id,
+                }
+              })}></PosterScrollList>
             )
           }
         </Box>

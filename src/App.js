@@ -6,9 +6,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { theme, darkTheme } from './theme/custom';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './screens/home'
+import HotMoreScreen from './screens/home/hotMore'
 import ExploreScreen from './screens/explore'
 import MeScreen from './screens/me'
 import MovieDetailScreen from './screens/movie/detail'
+import PhotoMoreScreen from './screens/movie/photoMore'
 import SearchResultScreen from './screens/search/result'
 import WebViewScreen from './screens/webview/index'
 import CelebrityDetailScreen from './screens/celebrity/detail'
@@ -112,6 +114,20 @@ const App = () => {
             title: '',
           }}
           component={MovieDetailScreen} />
+        <NoTabStack.Screen name="PhotoMore"
+          options={{
+            headerShown: true,
+            headerBackTitle: '',
+            title: '全部剧照',
+          }}
+          component={PhotoMoreScreen} />
+          <NoTabStack.Screen name="HotMore"
+          options={{
+            headerShown: true,
+            headerBackTitle: '',
+            title: '热门影视',
+          }}
+          component={HotMoreScreen} />
         <NoTabStack.Screen name="CelebrityDetail"
           options={{
             title: '影人详情',
