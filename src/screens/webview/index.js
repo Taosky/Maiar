@@ -5,9 +5,13 @@ import { Loading } from '../../theme/base'
 import { sleep } from "../../utils";
 import { useTheme } from '@react-navigation/native';
 
-const colorTheme = Appearance.getColorScheme();
+export default ({ route, navigation }) => {
+  const colorTheme = Appearance.getColorScheme();
+  const { uri, title } = route.params;
+  const { colors, } = useTheme();
+  const [loading, setLoading] = useState(true);
 
-const JS_DOUBAN_SUBJECT = `
+  const JS_DOUBAN_SUBJECT = `
   addNewStyle('html{background-color: #ebebeb !important;}');
   addNewStyle('.sub-trademark {display:none !important;}');
   addNewStyle('#TalionNav {display:none !important;}');
@@ -28,65 +32,61 @@ const JS_DOUBAN_SUBJECT = `
     : ``}
   `;
 
-const JS_DOUBAN_REVIEW = `
-  addNewStyle('html{background-color: #ebebeb !important;}');
-  addNewStyle('#TalionNav {display:none !important;}');
-  addNewStyle('.subject-card {display:none !important;}');
-  addNewStyle('.tags {display:none !important;}');
-  addNewStyle('iframe {display:none !important;}');
-  addNewStyle('.interests {display:none !important;}');
-  addNewStyle('.types {display:none !important;}');
-  addNewStyle('.download-app {display:none !important;}');
-  addNewStyle('.oia-readall {display:none !important;}');
-  addNewStyle('.hidden-content {display:none !important;}');
-  addNewStyle('.read-all {display:none !important;}');
-  ${colorTheme === 'dark' ? `addNewStyle('html { filter: invert(100%) hue-rotate(180deg); }');
-  addNewStyle('img  { filter: invert(100%) hue-rotate(180deg) contrast(100%); }');`
-    : ``}
-  addNewStyle('.note-content {max-height: none !important; overflow: auto !important;}');
-  let adTextEles = document.querySelectorAll("div[style~='center']");
-  for (const ele of adTextEles){ele.style.display='none'}
+  const JS_DOUBAN_REVIEW = `
+    addNewStyle('html{background-color: #ebebeb !important;}');
+    addNewStyle('#TalionNav {display:none !important;}');
+    addNewStyle('.subject-card {display:none !important;}');
+    addNewStyle('.tags {display:none !important;}');
+    addNewStyle('iframe {display:none !important;}');
+    addNewStyle('.interests {display:none !important;}');
+    addNewStyle('.types {display:none !important;}');
+    addNewStyle('.download-app {display:none !important;}');
+    addNewStyle('.oia-readall {display:none !important;}');
+    addNewStyle('.hidden-content {display:none !important;}');
+    addNewStyle('.read-all {display:none !important;}');
+    ${colorTheme === 'dark' ? `addNewStyle('html { filter: invert(100%) hue-rotate(180deg); }');
+    addNewStyle('img  { filter: invert(100%) hue-rotate(180deg) contrast(100%); }');`
+      : ``}
+    addNewStyle('.note-content {max-height: none !important; overflow: auto !important;}');
+    let adTextEles = document.querySelectorAll("div[style~='center']");
+    for (const ele of adTextEles){ele.style.display='none'}
+    `;
+
+  const JS_IMDB = `
+    addNewStyle('#imdbHeader {display:none !important;}');
+    addNewStyle('.ipc-split-button {display:none !important;}');
+    addNewStyle('.imdb-footer {display:none !important;}');
+    addNewStyle('.recently-viewed-items {display:none !important;}');
+    addNewStyle('.ipc-title__actions {display:none !important;}');
   `;
 
-const JS_IMDB = `
-  addNewStyle('#imdbHeader {display:none !important;}');
-  addNewStyle('.ipc-split-button {display:none !important;}');
-  addNewStyle('.imdb-footer {display:none !important;}');
-  addNewStyle('.recently-viewed-items {display:none !important;}');
-  addNewStyle('.ipc-title__actions {display:none !important;}');
-`;
-
-const INJECTED_JS = `
-  function cleanStyle() {
-    function addNewStyle(newStyle) {
-      let styleElement = document.getElementById('styles_js');
-      if (!styleElement) {
-          styleElement = document.createElement('style');
-          styleElement.type = 'text/css';
-          styleElement.id = 'styles_js';
-          document.getElementsByTagName('head')[0].appendChild(styleElement);
+  const INJECTED_JS = `
+    function cleanStyle() {
+      function addNewStyle(newStyle) {
+        let styleElement = document.getElementById('styles_js');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.type = 'text/css';
+            styleElement.id = 'styles_js';
+            document.getElementsByTagName('head')[0].appendChild(styleElement);
+        }
+        styleElement.appendChild(document.createTextNode(newStyle));
       }
-      styleElement.appendChild(document.createTextNode(newStyle));
-    }
 
-    if (window.location.href.startsWith('https://m.douban.com/movie/subject/')){
-      ${JS_DOUBAN_SUBJECT}
+      if (window.location.href.startsWith('https://m.douban.com/movie/subject/')){
+        ${JS_DOUBAN_SUBJECT}
+      }
+      if  (window.location.href.startsWith('https://m.douban.com/movie/review/')){
+        ${JS_DOUBAN_REVIEW}
+      }
+      if (window.location.href.startsWith('https://m.imdb.com/title/')){
+        ${JS_IMDB}
+      }
+      
     }
-    if  (window.location.href.startsWith('https://m.douban.com/movie/review/')){
-      ${JS_DOUBAN_REVIEW}
-    }
-    if (window.location.href.startsWith('https://m.imdb.com/title/')){
-      ${JS_IMDB}
-    }
-    
-  }
-  cleanStyle(); 
-`;
+    cleanStyle(); 
+  `;
 
-export default ({ route, navigation }) => {
-  const { uri, title } = route.params;
-  const { colors, } = useTheme();
-  const [loading, setLoading] = useState(true);
 
   const displayTabBar = () => {
     const parent = navigation.getParent();
