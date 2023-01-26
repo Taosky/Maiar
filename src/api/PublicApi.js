@@ -44,13 +44,14 @@ const getCelebrityById = (id)=>{
   return `/data/${id}.json`
 }
 
-const getRankMovies = (_type)=>{
+const getRankMovies = (_type, page=1, limit=20)=>{
+  console.log('page: ',page, 'limit: ', limit);
   if (_type==='movie_top250'){
-    return `/top250/1.json`
+    return `/top250/${page}.json`
   } else if (_type==='movie_weekly_best' || _type==='tv_chinese_weekly_best' || _type==='tv_global_weekly_best'){
-    return `/weekly_best/${_type.replace('_weekly_best','')}/1.json`
+    return `/weekly_best/${_type.replace('_weekly_best','')}/${page}.json`
   }
-  return `/category/${_type.replace('movie_','')}/1.json`
+  return `/category/${_type.replace('movie_','')}/${page}.json`
 }
 
 

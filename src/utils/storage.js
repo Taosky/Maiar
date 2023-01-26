@@ -157,7 +157,7 @@ const storage = new Storage({
     async rank(params) {
       const { id, syncParams: { page, limit } } = params;
       const type_ = id.replace(/-/g, '_').replace(/\+\d+/, '');
-      const data = await api.get(getRankMovies(type_), { page: page, limit: limit }, 'rank');
+      const data = await api.get(getRankMovies(type_, page, limit), {}, 'rank');
       console.log(`rank ${id} sync resp...`);
 
       if (data && !data.code) {
