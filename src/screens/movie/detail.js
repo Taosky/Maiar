@@ -66,7 +66,7 @@ const ButtonBox = ({ navigation, mid, vendors, trailer, douban_link, imdb_link, 
         {vendors?.length > 0 && <CommonButton marginRight='s' title='片源' onPressMethod={() => { setVendorShow(true); }} />}
         {trailer && <CommonButton marginRight='s' title='预告' onPressMethod={() => navigation.navigate('WebView', { uri: trailer, title: '预告' })} />}
         {douban_link && <CommonButton marginRight='s' title='豆瓣' onPressMethod={() => navigation.navigate('WebView', { uri: douban_link, title: '豆瓣' })} />}
-        {imdb_link && <CommonButton marginRight='s' title='IMDB' onPressMethod={() => navigation.navigate('WebView', { uri: imdb_link, title: 'IMDB' })} />}
+        {/* {imdb_link && <CommonButton marginRight='s' title='IMDB' onPressMethod={() => navigation.navigate('WebView', { uri: imdb_link, title: 'IMDB' })} />} */}
       </Box>
     </Box>
   )
