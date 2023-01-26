@@ -38,7 +38,7 @@ const storage = new Storage({
         tvVarietyShow: getTvVarietyShow(),
       }
       const { id } = params;
-      const data = await api.get(apiDict[id], {}, 'public');
+      const data = await api.get(apiDict[id], {}, 'movie');
       console.log(`hot ${id} sync resp...`);
 
       if (data && !data.code) {
@@ -56,7 +56,7 @@ const storage = new Storage({
     },
     async movie(params) {
       const { id } = params;
-      const data = await api.get(getMovieById(id), {}, 'public');
+      const data = await api.get(getMovieById(id), {}, 'movie');
       console.log(`movie ${id} sync resp...`);
 
       if (data && !data.code) {
@@ -67,7 +67,7 @@ const storage = new Storage({
         });
         return data;
       } else if (data.code === 404) {
-        console.log(`syncing photos ${id} not found`);
+        console.log(`syncing movie ${id} not found`);
         return data;
       } else {
         // 出错时抛出异常
@@ -76,7 +76,7 @@ const storage = new Storage({
     },
     async photos(params) {
       const { id } = params;
-      const data = await api.get(getMoviePhotosById(id), {}, 'public');
+      const data = await api.get(getMoviePhotosById(id), {}, 'movieExtra');
       console.log(`photos ${id} sync resp...`);
 
       if (data && !data.code) {
@@ -96,7 +96,7 @@ const storage = new Storage({
     },
     async rating(params) {
       const { id } = params;
-      const data = await api.get(getMovieRatingById(id), {}, 'public');
+      const data = await api.get(getMovieRatingById(id), {}, 'movieExtra');
       console.log(`rating ${id} sync resp...`);
 
       if (data && !data.code) {
@@ -116,7 +116,7 @@ const storage = new Storage({
     },
     async recommendations(params) {
       const { id } = params;
-      const data = await api.get(getMovieRecommendationsById(id), {}, 'public');
+      const data = await api.get(getMovieRecommendationsById(id), {}, 'movieExtra');
       console.log(`recommendations ${id} sync resp...`);
 
       if (data && !data.code) {
@@ -136,7 +136,7 @@ const storage = new Storage({
     },
     async celebrity(params) {
       const { id } = params;
-      const data = await api.get(getCelebrityById(id), {}, 'public');
+      const data = await api.get(getCelebrityById(id), {}, 'celebrity');
       console.log(`celebrity ${id} sync resp...`);
 
       if (data && !data.code) {
@@ -157,7 +157,7 @@ const storage = new Storage({
     async rank(params) {
       const { id, syncParams: { page, limit } } = params;
       const type_ = id.replace(/-/g, '_').replace(/\+\d+/, '');
-      const data = await api.get(getRankMovies(type_), { page: page, limit: limit }, 'public');
+      const data = await api.get(getRankMovies(type_), { page: page, limit: limit }, 'rank');
       console.log(`rank ${id} sync resp...`);
 
       if (data && !data.code) {

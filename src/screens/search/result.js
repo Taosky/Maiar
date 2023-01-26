@@ -40,19 +40,43 @@ export default ({ route, navigation }) => {
     }
     setLoading(true);
     let currentMovies = movies;
-    const results = await api.get(getMoviesByTitle(), { q: keyword, page: page, limit: 10 }, 'public');
-    if (results.length === 0) {
+    const limit = 20;
+    let request_body = {
+      collection: "movie",
+      database: "Douban",
+      dataSource: "Cluster0",
+      filter: {},
+      sort: {},
+      skip: (page - 1) * limit,
+      limit: limit,
+    };
+    request_body["filter"]["title"] = {};
+    request_body["filter"]["title"]["$regex"] = keyword;
+    request_body["filter"]["title"]["$options"] = "i";
+    request_body["sort"]["year"] = -1;
+    request_body["sort"]["_id"] = -1;
+    const response = await api.post(getMoviesByTitle(), request_body, 'movieSearch',null, 'LLppSL7L7bjMm7uHavkXOICu9iymDvwn51rADdUM7hXDjEhxVGZ8zPRqnKOdnLu8');
+    const results = response.documents;
+    if (results.length < limit) {
       setTimeout(() => {
         setNoMore(true);
       }, 300);
     }
     for (const result of results) {
+      let subtitle = result.year;
+      if (result.tags.length > 0){
+        for (const tag of result.tags.slice(0, 6)){
+          if (tag !== result.year){
+            subtitle += ' / ' + tag;
+          }
+        }
+      }
       const formatedMovie = {
         id: result.id,
         poster: result.poster,
         title: result.title,
-        subtitle: result.card_subtitle,
-        rating: result.rating,
+        subtitle: subtitle,
+        rating: {value: result.rating},
         isTv: result.is_tv,
         description: null,
         onPressMethod: () => {

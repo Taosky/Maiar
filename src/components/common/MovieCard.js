@@ -48,7 +48,7 @@ export default ({ id, poster, title, subtitle, rating, isTv, description, playab
             </Box>
             <Box marginVertical='ss' flexDirection='row' flexWrap='wrap'>
               <Rate rating={rating?.value} />
-              <Box marginLeft='ss'><Text>{rating?.value !== 0 ? rating?.value.toFixed(1) : '无评分'}</Text></Box>
+              <Box marginLeft='ss'><Text>{rating?.value !== 0 && rating?.value !== -1 ? rating?.value.toFixed(1) : '无评分'}</Text></Box>
             </Box>
             <Text numberOfLines={2} ellipsizeMode='tail' style={{ verticalAlign: 'top' }} >
               {(isTv === true || isTv === false) && <Tag color={isTv ? 'blue' : 'orange'} text={isTv ? '剧集' : '电影'} />}

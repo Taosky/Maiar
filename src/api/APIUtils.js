@@ -1,14 +1,32 @@
-const publicUrl = 'https://maiar.8610000.xyz/api/v1'
+const movieUrl = 'https://moviedb.8610000.xyz/';
+const movieExtraUrl = 'https://extra.moviedb.8610000.xyz/';
+const celebrityUrl = 'https://celebrity.8610000.xyz/';
+const rankUrl = 'https://rank.8610000.xyz';
+const movieSearchUrl = 'https://dataapi.8610000.xyz';
 
 const obj2String = (obj) => {
   return new URLSearchParams(obj).toString()
 }
 
 const request = async (url, options, apiType, api, token) => {
-  let apiUrl = publicUrl;
   let headers = {
     'Content-Type': 'application/json',
   };
+  let apiUrl = '';
+  if (apiType=== 'movie'){
+    apiUrl = movieUrl;
+  } else if (apiType === 'movieExtra'){
+    apiUrl = movieExtraUrl;
+  } else if (apiType === 'celebrity'){
+    apiUrl = celebrityUrl;
+  } else if (apiType === 'rank'){
+    apiUrl = rankUrl;
+  } else if (apiType === 'movieSearch'){
+    apiUrl = movieSearchUrl;
+    headers['api-key'] = token;
+    headers['Origin'] = 'https://moviefront.8610000.xyz';
+  }
+
   if (apiType === 'server') {
     apiUrl = api;
     if (token && token !== '') {
@@ -24,9 +42,14 @@ const request = async (url, options, apiType, api, token) => {
     url += '?' + urlStr
   } else if (options.method === 'POST') {
     fetchOptions.body = JSON.stringify(options.data)
+    console.log(fetchOptions);
   }
   try {
     let response = await fetch(`${apiUrl}${url}`, fetchOptions);
+    if (response.status===404){
+      return {code: 404, "msg": '信息不存在'}
+    }
+    console.log(response.status)
     res = await response.json();
     return res
   } catch (error) {

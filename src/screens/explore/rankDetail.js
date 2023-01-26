@@ -10,7 +10,7 @@ import MovieCardList from '../../components/common/MovieCardList'
 
 export default ({ route, navigation }) => {
   const pageSize = 20;
-  const { type_ } = route.params;
+  const { type_, title } = route.params;
   const [page, setPage] = useState(1);
   const [rankInfo, setRankInfo] = useState(null);
   const [movies, setMovies] = useState([]);
@@ -48,8 +48,8 @@ export default ({ route, navigation }) => {
     if (!rankInfo) {
       setRankInfo({
         total: data.total,
-        updateAt: data.subject_collection.updated_at,
-        title: data.subject_collection.title,
+        updateAt: data.updated_at,
+        title: title,
       });
     }
 

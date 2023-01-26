@@ -13,39 +13,44 @@ function getTodayStr() {
 }
 
 const getMovieHotGaia = () => {
-  return `/hot/${getTodayStr()}/movie_hot_gaia`
+  return `/hot/${getTodayStr()}/movie_hot_gaia.json`
 }
 const getMovieShowing = () => {
-  return `/hot/${getTodayStr()}/movie_showing`
+  return `/hot/${getTodayStr()}/movie_showing.json`
 }
 const getTvHot = () => {
-  return `/hot/${getTodayStr()}/tv_hot`
+  return `/hot/${getTodayStr()}/tv_hot.json`
 }
 const getTvVarietyShow = () => {
-  return `/hot/${getTodayStr()}/tv_variety_show`
+  return `/hot/${getTodayStr()}/tv_variety_show.json`
 }
 
 const getMovieById = (id) => {
-  return `/movie/${id}`
+  return `/data/${id}.json`
 }
 const getMovieRatingById = (id) => {
-  return `/movie/${id}/rating`
+  return `/rating/${id}.json`
 }
 const getMovieRecommendationsById = (id) => {
-  return `/movie/${id}/recommendations`
+  return `/recommendation/${id}.json`
 }
 const getMoviePhotosById = (id) => {
-  return `/movie/${id}/photos`
+  return `/photo/${id}.json`
 }
 const getMoviesByTitle = () => {
-  return `/movies`
+  return `/`
 }
 const getCelebrityById = (id)=>{
-  return `/celebrity/${id}`
+  return `/data/${id}.json`
 }
 
 const getRankMovies = (_type)=>{
-  return `/rank/${_type}`
+  if (_type==='movie_top250'){
+    return `/top250/1.json`
+  } else if (_type==='movie_weekly_best' || _type==='tv_chinese_weekly_best' || _type==='tv_global_weekly_best'){
+    return `/weekly_best/${_type.replace('_weekly_best','')}/1.json`
+  }
+  return `/category/${_type.replace('movie_','')}/1.json`
 }
 
 

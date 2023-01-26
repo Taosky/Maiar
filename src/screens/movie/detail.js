@@ -634,6 +634,7 @@ export default ({ route, navigation }) => {
     let data = await storage.load({ key: 'movie', id: mid });
     if (data?.code === 404) {
       alert404(navigation);
+      return;
     }
     let formated_movie = formatMovieData(data)
     setMovie(formated_movie);
