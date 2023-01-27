@@ -7,9 +7,9 @@ import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { Box, Text } from '../../theme/base'
-import { WLR } from '../../utils'
+import { sleep, WLR } from '../../utils'
 
-import { getSetting, writeSetting } from '../../utils';
+import { getSetting, writeSetting, clearSetting } from '../../utils';
 import * as api from '../../api/APIUtils'
 import { getServerToken, getUserInfo } from '../../api/ServerAPI'
 
@@ -79,8 +79,8 @@ const ServerSetting = ({ }) => {
 
   }
 
-  const getSettingData = async () => {
-    if (authorizeShow) {
+  const getSettingData = async (force = false) => {
+    if (authorizeShow && !force) {
       return;
     }
     const setting = await getSetting('serversetting');
@@ -88,6 +88,9 @@ const ServerSetting = ({ }) => {
       onChangeServerUrl(setting.serverUrl);
       setIsEnabled(true);
       await checkToken(setting.serverUrl, setting.token);
+    } else {
+      onChangeServerUrl('');
+      onChangeTokenExpired(true);
     }
   }
 
@@ -95,12 +98,19 @@ const ServerSetting = ({ }) => {
     const data = await api.post(getServerToken, { username: username, password: password }, 'server', serverUrl);
     if (data && data.access_token) {
       await writeSetting('serversetting', { serverUrl: serverUrl, token: data.access_token, player: selectedPlayer ? selectedPlayer : playerList[0].value });
-      Alert.alert('授权完成');
-      getSettingData();
       setAuthorizeShow(false);
+      Alert.alert('授权完成');
+      getSettingData(true);
+
     } else {
       Alert.alert('请求出错', '检查网络及验证信息');
     }
+  }
+  const removeAuth = async () => {
+    await clearSetting('serversetting');
+    Alert.alert('完成');
+    getSettingData();
+
   }
 
   return (
@@ -137,12 +147,13 @@ const ServerSetting = ({ }) => {
               onChangeText={text => onChangeServerUrl(text)}
             />
           </SettingLine>
+          <Text variant='desc4'>授权会在一定时间后过期，届时需重新授权</Text>
           {tokenExpired ?
             <TouchableOpacity onPress={() => { setAuthorizeShow(true); }}>
-              <Box><Text style={{ textAlign: 'center' }}>未授权（或过期</Text></Box>
+              <Box marginVertical='m'><Text style={{ textAlign: 'center' }}>点击授权</Text></Box>
             </TouchableOpacity> :
-            <TouchableOpacity onPress={() => { setAuthorizeShow(true); }}>
-              <Box><Text style={{ textAlign: 'center' }}>清除授权</Text></Box>
+            <TouchableOpacity onPress={() => { removeAuth(); }}>
+              <Box marginVertical='m'><Text style={{ textAlign: 'center' }}>清除授权</Text></Box>
             </TouchableOpacity>
           }
 

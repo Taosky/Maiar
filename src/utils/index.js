@@ -2,7 +2,7 @@ import { WLR, WINDOWWIDTH, POSTERWIDTH, PHOTOWIDTH, alert404, tryToOpenUri } fro
 import storage from "./storage";
 import { timestampIntervalToSunday, timestampIntervalToTomorrow, getDateStrHyphen, sleep } from "./others";
 import { readWatchStatus, writeWatchStatus, removeWatchStatus, readWatchedValuesInCalendar, readStatistics } from "./watch";
-import { getSetting, writeSetting } from "./setting";
+import { getSetting, writeSetting, clearSetting } from "./setting";
 
 export {
   WLR,
@@ -23,4 +23,5 @@ export {
   readStatistics,
   getSetting,
   writeSetting,
+  clearSetting,
 }

@@ -19,8 +19,15 @@ const writeSetting = async (key, data) => {
   await storage.save({ key: key, data: data });
 }
 
+const clearSetting = async (key) => {
+  console.log('clear setting: ', key);
+  await storage.save({ key: key, data: null });
+
+}
+
 
 export {
   getSetting,
   writeSetting,
+  clearSetting
 }
