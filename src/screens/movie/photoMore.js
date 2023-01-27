@@ -23,9 +23,7 @@ export default ({ route, navigation }) => {
 
   return (
     <ScrollView>
-      <Box padding='m'>
         <Photos type='wall' mid={mid} />
-      </Box>
     </ScrollView>
   )
 };

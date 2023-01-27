@@ -3,11 +3,11 @@ import { TouchableOpacity, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { Box, Text } from '../../theme/base'
 import Rate from './StarRating'
-import { WLR, } from '../../utils'
+import { WLR, POSTERWIDTH, PHOTOWIDTH } from '../../utils'
 import PlayableTag from './PlayableTag';
 
-const posterWidth = 90 * WLR;
-const photoHeight = 100 * WLR;
+const posterWidth = POSTERWIDTH;
+const photoHeight = PHOTOWIDTH;
 
 
 const styles = StyleSheet.create({

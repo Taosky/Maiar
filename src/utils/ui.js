@@ -1,8 +1,11 @@
 import { Dimensions, Alert, Linking } from 'react-native'
 import Clipboard from '@react-native-clipboard/clipboard';
 
+const WINDOWWIDTH = Dimensions.get('window').width;
+const WLR = WINDOWWIDTH / 375;
 
-const WLR = Dimensions.get('window').width / 375;
+const POSTERWIDTH = 90 * WLR;
+const PHOTOWIDTH = 100 * WLR;
 
 const alert404 = (navigation = null) => Alert.alert(
   '请求失败',
@@ -40,6 +43,9 @@ const tryToOpenUri = (uri, url) => {
 
 export {
   WLR,
+  WINDOWWIDTH,
+  POSTERWIDTH,
+  PHOTOWIDTH,
   alert404,
   tryToOpenUri,
 }

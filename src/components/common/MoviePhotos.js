@@ -71,8 +71,8 @@ export default ({ navigation, mid, type = 'line', ...rest }) => {
             })
           }} />}
           {type === 'wall' && <PosterWallList posterItems={
-            smalls?.map((photo, index) => <PhotoPoster marginVertical='s' key={index} photo={photo} />)
-          } />}
+            smalls?.map((photo, index) => <PhotoPoster key={index} photo={photo} />)
+          } isPhoto={true} />}
 
           <ImageView
             images={larges}

@@ -48,11 +48,9 @@ export default ({ route, navigation }) => {
 
   return (
     <ScrollView>
-      <Box padding='m'>
       <PosterWallList posterItems={moviePosters?.map((movie) =>
-        <MoviePoster marginBottom='s' key={movie.id} movie={movie} />
+        <MoviePoster key={movie.id} movie={movie} />
       )} />
-      </Box>
     </ScrollView>
   )
 };
